@@ -7,10 +7,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type AddPayload struct {
-	Numbers []float64 `json:"numbers"`
-}
-
 type Handler struct {
 	Logger *zap.Logger
 }
@@ -21,6 +17,10 @@ type SuccessResponse struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type AddPayload struct {
+	Numbers []float64 `json:"numbers"`
 }
 
 // @Summary		Add numbers
@@ -39,6 +39,12 @@ func (h *Handler) Add(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		errResp.Error = "Invalid JSON payload"
+		c.JSON(http.StatusBadRequest, errResp)
+		return
+	}
+
+	if len(payload.Numbers) == 0 {
+		errResp.Error = "Missing 'numbers' field in the payload"
 		c.JSON(http.StatusBadRequest, errResp)
 		return
 	}

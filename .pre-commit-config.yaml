@@ -18,7 +18,7 @@ repos:
         files: ^go-server/.*\.go$
         types: [file]
       - id: no-go-testing
-        files: ^go-server/.*\.go$
+        files: ^(?!.*_test\.go$)go-server/.*\.go$
         types: [file]
 
   - repo: local
