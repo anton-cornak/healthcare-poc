@@ -1,0 +1,120 @@
+definitions:
+  handlers.AddPayload:
+    properties:
+      numbers:
+        items:
+          type: number
+        type: array
+    type: object
+  handlers.ComputePayload:
+    properties:
+      add:
+        items:
+          type: number
+        type: array
+      subtract:
+        items:
+          type: number
+        type: array
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handlers.SubstractPayload:
+    properties:
+      number:
+        type: number
+      subtract:
+        items:
+          type: number
+        type: array
+    type: object
+  handlers.SuccessResponse:
+    properties:
+      result:
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /add:
+    post:
+      consumes:
+      - application/json
+      description: Add all numbers provided in the payload
+      operationId: add-operation
+      parameters:
+      - description: Numbers to add
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AddPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Add numbers
+  /compute:
+    post:
+      consumes:
+      - application/json
+      description: Adds all numbers in the 'add' list and subtracts all numbers in
+        the 'subtract' list.
+      parameters:
+      - description: Compute payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ComputePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Compute result
+      tags:
+      - Math Operations
+  /subtract:
+    post:
+      consumes:
+      - application/json
+      description: Subtract all numbers in the 'subtract' list from the 'number'.
+      parameters:
+      - description: Numbers to substract from the 'number'
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SubstractPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Subtract numbers
+      tags:
+      - Math Operations
+swagger: "2.0"
