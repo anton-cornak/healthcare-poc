@@ -43,3 +43,4 @@ repos:
         files: ^go-server/
         args:
           - --generalInfo=go-server/cmd/main.go
+          - --output=go-server/docs
