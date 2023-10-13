@@ -5,6 +5,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/acornak/poc-gpt/docs"
 )
 
 func main() {
@@ -22,6 +26,8 @@ func main() {
 	handler := &handlers.Handler{Logger: logger}
 
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.POST("/add", handler.Add)
 	r.POST("/subtract", handler.Subtract)
 	r.POST("/compute", handler.Compute)

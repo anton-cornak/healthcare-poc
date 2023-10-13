@@ -4,6 +4,7 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+        exclude: '^.*swagger\.json$'
       - id: check-yaml
       - id: check-added-large-files
 
@@ -11,7 +12,34 @@ repos:
     rev: v0.5.1
     hooks:
       - id: go-fmt
+        files: ^go-server/.*\.go$
+        types: [file]
       - id: go-imports
+        files: ^go-server/.*\.go$
+        types: [file]
       - id: no-go-testing
-      - id: golangci-lint
-      - id: go-unit-tests
+        files: ^go-server/.*\.go$
+        types: [file]
+
+  - repo: local
+    hooks:
+    - id: custom-golangci-lint
+      name: golangci-lint
+      entry: sh -c 'cd go-server && golangci-lint run'
+      language: system
+      files: ^go-server/.*\.go$
+      types: [file]
+    - id: custom-go-unit-tests
+      name: go-unit-tests
+      entry: sh -c 'cd go-server && go test ./...'
+      language: system
+      files: ^go-server/.*\.go$
+      types: [file]
+
+  - repo: https://github.com/muya/swaggo-hooks
+    rev: v1.1.1
+    hooks:
+      - id: swag-init
+        files: ^go-server/
+        args:
+          - --generalInfo=go-server/cmd/main.go
