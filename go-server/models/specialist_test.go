@@ -15,13 +15,29 @@ func TestAllSpecialists_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com"))
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+
+	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(rows)
 
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.AllSpecialists()
 
+	expected := []*Specialist{
+		{
+			ID:          1,
+			Name:        "John Doe",
+			SpecialtyID: 1,
+			Location:    "New York",
+			Address:     "123 Main St",
+			Url:         "https://example.com",
+			Telephone:   "123-456-7890",
+			Email:       "me@example.com",
+		},
+	}
+
 	assert.NoError(t, err)
-	assert.NotNil(t, res)
+	assert.Equal(t, expected, res)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -294,5 +310,56 @@ func TestUpdateSpecialist_Error(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetSpecialistBySpecialtyAndLocation_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+
+	mock.ExpectQuery("SELECT (.+) FROM specialist").WithArgs(1, "123 Main St", 10000).WillReturnRows(rows)
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistBySpecialtyAndLocation(1, 10000, "123 Main St")
+
+	expected := []*Specialist{
+		{
+			ID:          1,
+			Name:        "John Doe",
+			SpecialtyID: 1,
+			Location:    "New York",
+			Address:     "123 Main St",
+			Url:         "https://example.com",
+			Telephone:   "123-456-7890",
+			Email:       "me@example.com",
+		},
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetSpecialistBySpecialtyAndLocation_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery("SELECT (.+) FROM specialist").WithArgs(1, "123 Main St", 10000).WillReturnError(errors.New("mocked error"))
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistBySpecialtyAndLocation(1, 10000, "123 Main St")
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "mocked error")
+	assert.Nil(t, res)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

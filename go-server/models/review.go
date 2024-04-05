@@ -8,8 +8,16 @@ type Review struct {
 	Comment      string  `json:"comment,omitempty"`
 }
 
+/*
+AllReviews returns all reviews from the database
+The function returns a slice of pointers to Review structs
+The function returns an error if there was an issue with the database
+*/
 func (m *DBModel) AllReviews() ([]*Review, error) {
-	stmt := "SELECT id, specialist_id, url, rating, comment FROM review"
+	stmt := `
+	SELECT id, specialist_id, url, rating, comment
+	FROM review
+	`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
@@ -35,8 +43,18 @@ func (m *DBModel) AllReviews() ([]*Review, error) {
 	return reviews, nil
 }
 
+/*
+GetReview returns a review from the database with a specific id
+The id is the id of the review
+The function returns a pointer to a Review struct
+The function returns an error if there was an issue with the database
+*/
 func (m *DBModel) GetReviewBySpecialistId(id int) (*Review, error) {
-	stmt := `SELECT id, specialist_id, url, rating, comment FROM review WHERE specialist_id=$1`
+	stmt := `
+	SELECT id, specialist_id, url, rating, comment
+	FROM review
+	WHERE specialist_id=$1
+	`
 
 	row := m.DB.QueryRow(stmt, id)
 
@@ -49,8 +67,17 @@ func (m *DBModel) GetReviewBySpecialistId(id int) (*Review, error) {
 	return &r, nil
 }
 
+/*
+GetReviewByID returns a review from the database with a specific id
+The id is the id of the review
+The function returns a pointer to a Review struct
+The function returns an error if there was an issue with the database
+*/
 func (m *DBModel) InsertReview(r Review) error {
-	stmt := `INSERT INTO review (specialist_id, url, rating, comment) VALUES ($1, $2, $3, $4)`
+	stmt := `
+	INSERT INTO review (specialist_id, url, rating, comment)
+	VALUES ($1, $2, $3, $4)
+	`
 
 	_, err := m.DB.Exec(stmt, r.SpecialistId, r.Url, r.Rating, r.Comment)
 	if err != nil {
@@ -60,8 +87,16 @@ func (m *DBModel) InsertReview(r Review) error {
 	return nil
 }
 
+/*
+DeleteReview deletes a review from the database with a specific id
+The id is the id of the review
+The function returns an error if there was an issue with the database
+*/
 func (m *DBModel) DeleteReview(id int) error {
-	stmt := `DELETE FROM review WHERE id = $1`
+	stmt := `
+	DELETE FROM review
+	WHERE id = $1
+	`
 
 	_, err := m.DB.Exec(stmt, id)
 	if err != nil {
@@ -71,8 +106,17 @@ func (m *DBModel) DeleteReview(id int) error {
 	return nil
 }
 
+/*
+UpdateReview updates a review in the database
+The r parameter is a Review struct
+The function returns an error if there was an issue with the database
+*/
 func (m *DBModel) UpdateReview(r Review) error {
-	stmt := `UPDATE review SET specialist_id=$1, url=$2, rating=$3, comment=$4 WHERE id=$5`
+	stmt := `
+	UPDATE review
+	SET specialist_id=$1, url=$2, rating=$3, comment=$4
+	WHERE id=$5
+	`
 
 	_, err := m.DB.Exec(stmt, r.SpecialistId, r.Url, r.Rating, r.Comment, r.ID)
 	if err != nil {

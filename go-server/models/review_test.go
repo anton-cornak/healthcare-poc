@@ -22,8 +22,18 @@ func TestAllReviews_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.AllReviews()
 
+	expected := []*Review{
+		{
+			ID:           1,
+			SpecialistId: 1,
+			Url:          "test",
+			Rating:       4.5,
+			Comment:      "test",
+		},
+	}
+
 	assert.NoError(t, err)
-	assert.NotNil(t, res)
+	assert.Equal(t, expected, res)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
