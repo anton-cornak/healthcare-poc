@@ -19,6 +19,7 @@ COPY cmd/ ./cmd
 COPY docs/ ./docs
 COPY handlers/ ./handlers
 COPY models/ ./models
+COPY types/ ./types
 
 # Build the Go app
 RUN go build -o main ./cmd

@@ -64,7 +64,12 @@ INSERT INTO specialist (id, name, specialty_id, location, address, url, telephon
     (12, 'Dr. Laura White', 12, 'POINT(-81.379234 28.538336)', '909 Hormone Ln, Endocrinology Town, ET 65432', 'https://www.endoexample.com', '876-109-2345', 'laura.white@example.com'),
     (13, 'Dr. Mike Jordan', 13, 'POINT(-84.387982 33.748995)', '1010 Rheumatic Pkwy, Rheumatology City, RC 54321', 'https://www.rheumaexample.com', '987-210-3456', 'mike.jordan@example.com'),
     (14, 'Dr. Nancy Allen', 14, 'POINT(-71.412834 41.823989)', '1111 Allergy Ave, Allergy and Immunology Ville, AIV 43210', 'https://www.allergyexample.com', '098-321-4567', 'nancy.allen@example.com'),
-    (15, 'Dr. Oliver Martinez', 15, 'POINT(-99.133208 19.432608)', '1212 Infectious Disease Dr, Infectious Disease City, IDC 32109', 'https://www.infectiousdiseaseexample.com', '109-432-5678', 'oliver.martinez@example.com');
+    (15, 'Dr. Oliver Martinez', 15, 'POINT(-99.133208 19.432608)', '1212 Infectious Disease Dr, Infectious Disease City, IDC 32109', 'https://www.infectiousdiseaseexample.com', '109-432-5678', 'oliver.martinez@example.com'),
+    (16, 'Dr. Anton Cornak', 10, 'POINT(21.2496774 48.7172272)', '707 Bone Blvd, Orthopedics City, OC 09876', 'https://www.orthoexample.com', '654-987-0123', 'julia.carter@example.com'),
+    (17, 'Dr. Antonin Cornak', 10, 'POINT(21.2496774 48.7172272)', '707 Bone Blvd, Orthopedics City, OC 09876', 'https://www.orthoexample.com', '654-987-0123', 'julia.carter@example.com'),
+    (18, 'Dr. Matka Kresna', 10, 'POINT(21.2496774 48.7172272)', '707 Bone Blvd, Orthopedics City, OC 09876', 'https://www.orthoexample.com', '654-987-0123', 'julia.carter@example.com'),
+    (19, 'Dr. Zidan Sufurki', 10, 'POINT(21.2496774 48.7172272)', '707 Bone Blvd, Orthopedics City, OC 09876', 'https://www.orthoexample.com', '654-987-0123', 'julia.carter@example.com'),
+    (20, 'Dr. David Sufuski', 10, 'POINT(21.2496774 48.7172272)', '707 Bone Blvd, Orthopedics City, OC 09876', 'https://www.orthoexample.com', '654-987-0123', 'julia.carter@example.com');
 
 INSERT INTO review (id, specialist_id, url, rating, comment) VALUES
     (1, 1, 'https://www.cardioexample.com', 4.5, 'Dr. Johnson was very knowledgeable and caring.'),

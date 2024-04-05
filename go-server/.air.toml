@@ -3,8 +3,8 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-bin = "./bin/poc-gpt"
-cmd = "go build -o ./bin/poc-gpt ./cmd"
+bin = "./bin/healthcare-poc"
+cmd = "go build -o ./bin/healthcare-poc ./cmd"
 exclude_dir = ["assets", "vendor", "testdata", "bin"]
 delay = 0
 exclude_file = []

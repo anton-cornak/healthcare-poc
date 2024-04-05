@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +23,7 @@ func TestAllReviews_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.AllReviews()
 
-	expected := []*Review{
+	expected := []*types.Review{
 		{
 			ID:           1,
 			SpecialistId: 1,
@@ -69,7 +70,7 @@ func TestGetReviewBySpecialistId_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetReviewBySpecialistId(1)
 
-	expected := &Review{
+	expected := &types.Review{
 		ID:           1,
 		SpecialistId: 1,
 		Url:          "test",
@@ -107,7 +108,7 @@ func TestInsertReview_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	r := Review{
+	r := types.Review{
 		SpecialistId: 1,
 		Url:          "test",
 		Rating:       4.5,
@@ -130,7 +131,7 @@ func TestInsertReview_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	r := Review{
+	r := types.Review{
 		SpecialistId: 1,
 		Url:          "test",
 		Rating:       4.5,
@@ -187,7 +188,7 @@ func TestUpdateReview_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	r := Review{
+	r := types.Review{
 		SpecialistId: 1,
 		Url:          "test",
 		Rating:       4.5,
@@ -210,7 +211,7 @@ func TestUpdateReview_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	r := Review{
+	r := types.Review{
 		SpecialistId: 1,
 		Url:          "test",
 		Rating:       4.5,

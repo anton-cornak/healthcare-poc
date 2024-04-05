@@ -1,17 +1,13 @@
 package models
 
-type Specialty struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
+import "github.com/acornak/healthcare-poc/types"
 
 /*
 AllSpecialties returns all specialties from the database
 The function returns a slice of pointers to Specialty structs
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) AllSpecialties() ([]*Specialty, error) {
+func (m *DBModel) AllSpecialties() ([]*types.Specialty, error) {
 	stmt := `
 	SELECT id, name, description
 	FROM specialty
@@ -23,10 +19,10 @@ func (m *DBModel) AllSpecialties() ([]*Specialty, error) {
 	}
 	defer rows.Close()
 
-	var specialties []*Specialty
+	var specialties []*types.Specialty
 
 	for rows.Next() {
-		var s Specialty
+		var s types.Specialty
 		err = rows.Scan(&s.ID, &s.Name, &s.Description)
 		if err != nil {
 			return nil, err
@@ -47,7 +43,7 @@ The id is the id of the specialty
 The function returns a pointer to a Specialty struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) GetSpecialtyByID(id int) (*Specialty, error) {
+func (m *DBModel) GetSpecialtyByID(id int) (*types.Specialty, error) {
 	stmt := `
 	SELECT id, name, description
 	FROM specialty
@@ -56,7 +52,7 @@ func (m *DBModel) GetSpecialtyByID(id int) (*Specialty, error) {
 
 	row := m.DB.QueryRow(stmt, id)
 
-	var s Specialty
+	var s types.Specialty
 	err := row.Scan(&s.ID, &s.Name, &s.Description)
 	if err != nil {
 		return nil, err
@@ -70,7 +66,7 @@ GetSpecialtyByName returns a specialty from the database with a specific name
 The name is the name of the specialty
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) InsertSpecialty(s Specialty) error {
+func (m *DBModel) InsertSpecialty(s types.Specialty) error {
 	stmt := `
 	INSERT INTO specialty (name, description)
 	VALUES ($1, $2)
@@ -108,7 +104,7 @@ UpdateSpecialty updates a specialty in the database
 The s parameter is a Specialty struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) UpdateSpecialty(s Specialty) error {
+func (m *DBModel) UpdateSpecialty(s types.Specialty) error {
 	stmt := `
 	UPDATE specialty
 	SET name=$1, description=$2

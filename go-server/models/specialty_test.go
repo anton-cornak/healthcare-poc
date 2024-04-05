@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +23,7 @@ func TestAllSpecialties_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.AllSpecialties()
 
-	expected := []*Specialty{
+	expected := []*types.Specialty{
 		{
 			ID:          1,
 			Name:        "test",
@@ -67,7 +68,7 @@ func TestGetSpecialtyByID_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetSpecialtyByID(1)
 
-	expected := &Specialty{
+	expected := &types.Specialty{
 		ID:          1,
 		Name:        "test",
 		Description: "test",
@@ -103,7 +104,7 @@ func TestInsertSpecialty_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialty{
+	s := types.Specialty{
 		Name:        "test",
 		Description: "test",
 	}
@@ -124,7 +125,7 @@ func TestInsertSpecialty_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialty{
+	s := types.Specialty{
 		Name:        "test",
 		Description: "test",
 	}
@@ -179,7 +180,7 @@ func TestUpdateSpecialty_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialty{
+	s := types.Specialty{
 		ID:          1,
 		Name:        "test",
 		Description: "test",
@@ -201,7 +202,7 @@ func TestUpdateSpecialty_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialty{
+	s := types.Specialty{
 		ID:          1,
 		Name:        "test",
 		Description: "test",

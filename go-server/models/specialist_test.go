@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +24,7 @@ func TestAllSpecialists_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.AllSpecialists()
 
-	expected := []*Specialist{
+	expected := []*types.Specialist{
 		{
 			ID:          1,
 			Name:        "John Doe",
@@ -75,7 +76,7 @@ func TestGetSpecialistBySpecialty_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetSpecialistBySpecialty(1)
 
-	expected := []*Specialist{
+	expected := []*types.Specialist{
 		{
 			ID:   1,
 			Name: "John Doe",
@@ -137,7 +138,7 @@ func TestGetSpecialistByID_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetSpecialistByID(1)
 
-	expected := &Specialist{
+	expected := &types.Specialist{
 		ID:   1,
 		Name: "John Doe",
 
@@ -179,7 +180,7 @@ func TestInsertSpecialist_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialist{
+	s := types.Specialist{
 		Name:        "John Doe",
 		SpecialtyID: 1,
 		Location:    "New York",
@@ -205,7 +206,7 @@ func TestInsertSpecialist_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialist{
+	s := types.Specialist{
 		Name:        "John Doe",
 		SpecialtyID: 1,
 		Location:    "New York",
@@ -265,7 +266,7 @@ func TestUpdateSpecialist_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialist{
+	s := types.Specialist{
 		ID:          1,
 		Name:        "John Doe",
 		SpecialtyID: 1,
@@ -292,7 +293,7 @@ func TestUpdateSpecialist_Error(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := Specialist{
+	s := types.Specialist{
 		ID:          1,
 		Name:        "John Doe",
 		SpecialtyID: 1,
@@ -328,7 +329,7 @@ func TestGetSpecialistBySpecialtyAndLocation_Success(t *testing.T) {
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetSpecialistBySpecialtyAndLocation(1, 10000, "123 Main St")
 
-	expected := []*Specialist{
+	expected := []*types.Specialist{
 		{
 			ID:          1,
 			Name:        "John Doe",

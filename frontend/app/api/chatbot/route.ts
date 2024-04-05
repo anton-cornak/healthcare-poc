@@ -7,7 +7,8 @@ async function postOpenAI(
 	const openAIURL = process.env.OPENAI_URL;
 
 	const body = {
-		model: "gpt-3.5-turbo-0613",
+		// model: "gpt-3.5-turbo-0613",
+		model: "gpt-4-0125-preview",
 		messages: messages,
 		functions: functionDescription,
 	};
@@ -59,55 +60,57 @@ export async function POST(req: Request): Promise<Response> {
 		);
 	}
 
+	let iterations = 0;
+	const maxIterations = 10;
+	const conversations: object[] = [{ role: "user", content: body.message }];
+
 	try {
-		const openAIResponse = await postOpenAI(apiKey, [
-			{ role: "user", content: body.message },
-		]);
-		const { choices } = await openAIResponse.json();
-		const choice = choices[0];
+		while (iterations < maxIterations) {
+			const openAIResponse = await postOpenAI(apiKey, conversations);
+			const { choices } = await openAIResponse.json();
+			const choice = choices[0];
 
-		if (!choice || !choice.message) {
-			throw new Error("Invalid response from OpenAI");
-		}
+			if (!choice || !choice.message) {
+				throw new Error("Invalid response from OpenAI");
+			}
 
-		// Handle direct message responses
-		if (!choice.message.function_call) {
-			return new Response(
-				JSON.stringify({ message: choice.message.content }),
-				{
-					status: 200,
-					headers: { "Content-Type": "application/json" },
-				},
-			);
-		}
+			// Handle direct message responses
+			if (!choice.message.function_call) {
+				return new Response(
+					JSON.stringify({ message: choice.message.content }),
+					{
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					},
+				);
+			}
 
-		const { name: endpoint, arguments: bodyToServer } =
-			choice.message.function_call;
+			const { name: endpoint, arguments: bodyToServer } =
+				choice.message.function_call;
 
-		// Send request to the determined server endpoint
-		const serverResponse = await postToServer(endpoint, bodyToServer);
-		const serverResult = await serverResponse.json();
-
-		// Return processed result back to the user
-		const finalResponse = await postOpenAI(apiKey, [
-			{ role: "user", content: body.message },
-			{
+			conversations.push({
 				role: "assistant",
 				content: null,
 				function_call: { name: endpoint, arguments: bodyToServer },
-			},
-			{
+			});
+
+			// Send request to the determined server endpoint
+			const serverResponse = await postToServer(endpoint, bodyToServer);
+			const serverResult = await serverResponse.json();
+
+			conversations.push({
 				role: "function",
 				name: endpoint,
 				content: JSON.stringify(serverResult),
-			},
-		]);
+			});
 
-		const finalResult = await finalResponse.json();
+			iterations++;
+		}
+
 		return new Response(
-			JSON.stringify({ message: finalResult.choices[0].message.content }),
+			JSON.stringify({ message: "Exceeded maximum operation depth." }),
 			{
-				status: 200,
+				status: 500,
 				headers: { "Content-Type": "application/json" },
 			},
 		);

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/acornak/poc-gpt/handlers"
+	"github.com/acornak/healthcare-poc/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
@@ -69,6 +69,7 @@ func TestMainRoutes(t *testing.T) {
 		{"POST", "/api/v1/add", http.StatusBadRequest},
 		{"POST", "/api/v1/subtract", http.StatusBadRequest},
 		{"POST", "/api/v1/compute", http.StatusBadRequest},
+		{"POST", "/api/v1/specialist", http.StatusBadRequest},
 	}
 
 	for _, tt := range tests {

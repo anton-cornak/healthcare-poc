@@ -7,19 +7,23 @@ import (
 	"go.uber.org/zap"
 )
 
+type SuccessResponse struct {
+	Result float64 `json:"result"`
+}
+
 type AddPayload struct {
 	Numbers []float64 `json:"numbers"`
 }
 
 // @Summary		Add numbers
 // @Description	Add all numbers provided in the payload
-// @ID				add-operation
-// @Accept			json
+// @ID			add-operation
+// @Accept		json
 // @Produce		json
-// @Param			payload	body		AddPayload	true	"Numbers to add"
+// @Param		payload	body		AddPayload	true	"Numbers to add"
 // @Success		200		{object}	SuccessResponse
 // @Failure		400		{object}	ErrorResponse
-// @Router			/add [post]
+// @Router		/add [post]
 func (h *Handler) Add(c *gin.Context) {
 	var payload AddPayload
 	var errResp ErrorResponse

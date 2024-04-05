@@ -1,69 +1,52 @@
 const functionDescription = [
 	{
-		name: "add",
-		description: "Add two or more numbers together",
+		name: "specialties",
+		description: "Gets list of all specialties in the database",
+	},
+	{
+		name: "location",
+		description:
+			"Generates WKT representation of a location from a string representation of the location",
 		parameters: {
 			type: "object",
 			properties: {
-				numbers: {
-					type: "array",
-					items: {
-						type: "number",
-					},
-					description: "An array of numbers to be added together",
+				user_location: {
+					type: "string",
+					description:
+						"A string representation of the user's location, e.g. 'London, UK'",
 				},
 			},
-			required: ["numbers"],
-			description: "Payload containing numbers to add",
+			required: ["user_location"],
+			description:
+				"Payload containing user location as a string representation",
 		},
 	},
 	{
-		name: "subtract",
-		description: "Subtract two or more numbers from the base number",
+		name: "specialist",
+		description:
+			"Gets a specialist from the database by the user defined preferences, such as specialty, location and distance from the user",
 		parameters: {
 			type: "object",
 			properties: {
-				number: {
+				specialty_id: {
 					type: "number",
-					description: "The base number to subtract from",
-				},
-				subtract: {
-					type: "array",
-					items: {
-						type: "number",
-					},
 					description:
-						"An array of numbers to be substracted from the base number",
+						"Name of the specialty from the list of specialties - this should always correspond to the /specialties endpoint response",
+				},
+				radius: {
+					type: "number",
+					description:
+						"Radius a user is willing to travel to see a specialist. Radius should always be in METERS.",
+				},
+				user_location: {
+					type: "string",
+					description:
+						"WKT representation representation of the user's location, e.g. 'POINT(21.2496774 48.7172272)'",
 				},
 			},
-			required: ["number, subtract"],
-			description: "Payload containing numbers to subtract from a number",
-		},
-	},
-	{
-		name: "compute",
-		description: "Add or substract list of numbers",
-		parameters: {
-			type: "object",
-			properties: {
-				add: {
-					type: "array",
-					items: {
-						type: "number",
-					},
-					description: "An array of numbers to be added together",
-				},
-				subtract: {
-					type: "array",
-					items: {
-						type: "number",
-					},
-					description:
-						"An array of numbers to be substracted from the added numbers or from each other if no numbers are added",
-				},
-			},
-			required: ["number, subtract"],
-			description: "Payload containing numbers to subtract from a number",
+			required: ["specialty_id", "radius", "user_location"],
+			description:
+				"Payload containing user preferences when searching for a specialist",
 		},
 	},
 ];

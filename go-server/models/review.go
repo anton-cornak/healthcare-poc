@@ -1,19 +1,13 @@
 package models
 
-type Review struct {
-	ID           int     `json:"id"`
-	SpecialistId int     `json:"specialist_id"`
-	Url          string  `json:"url"`
-	Rating       float64 `json:"rating"`
-	Comment      string  `json:"comment,omitempty"`
-}
+import "github.com/acornak/healthcare-poc/types"
 
 /*
 AllReviews returns all reviews from the database
 The function returns a slice of pointers to Review structs
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) AllReviews() ([]*Review, error) {
+func (m *DBModel) AllReviews() ([]*types.Review, error) {
 	stmt := `
 	SELECT id, specialist_id, url, rating, comment
 	FROM review
@@ -25,10 +19,10 @@ func (m *DBModel) AllReviews() ([]*Review, error) {
 	}
 	defer rows.Close()
 
-	var reviews []*Review
+	var reviews []*types.Review
 
 	for rows.Next() {
-		var s Review
+		var s types.Review
 		err = rows.Scan(&s.ID, &s.SpecialistId, &s.Url, &s.Rating, &s.Comment)
 		if err != nil {
 			return nil, err
@@ -49,7 +43,7 @@ The id is the id of the review
 The function returns a pointer to a Review struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) GetReviewBySpecialistId(id int) (*Review, error) {
+func (m *DBModel) GetReviewBySpecialistId(id int) (*types.Review, error) {
 	stmt := `
 	SELECT id, specialist_id, url, rating, comment
 	FROM review
@@ -58,7 +52,7 @@ func (m *DBModel) GetReviewBySpecialistId(id int) (*Review, error) {
 
 	row := m.DB.QueryRow(stmt, id)
 
-	var r Review
+	var r types.Review
 	err := row.Scan(&r.ID, &r.SpecialistId, &r.Url, &r.Rating, &r.Comment)
 	if err != nil {
 		return nil, err
@@ -73,7 +67,7 @@ The id is the id of the review
 The function returns a pointer to a Review struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) InsertReview(r Review) error {
+func (m *DBModel) InsertReview(r types.Review) error {
 	stmt := `
 	INSERT INTO review (specialist_id, url, rating, comment)
 	VALUES ($1, $2, $3, $4)
@@ -111,7 +105,7 @@ UpdateReview updates a review in the database
 The r parameter is a Review struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) UpdateReview(r Review) error {
+func (m *DBModel) UpdateReview(r types.Review) error {
 	stmt := `
 	UPDATE review
 	SET specialist_id=$1, url=$2, rating=$3, comment=$4

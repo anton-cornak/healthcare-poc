@@ -1,18 +1,13 @@
 package models
 
-type Specialist struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	SpecialtyID int    `json:"specialty_id"`
-	Location    string `json:"location,omitempty"`
-	Address     string `json:"address,omitempty"`
-	Url         string `json:"url,omitempty"`
-	Telephone   string `json:"telephone,omitempty"`
-	Email       string `json:"email,omitempty"`
-}
+import "github.com/acornak/healthcare-poc/types"
 
-// AllSpecialists returns all specialists from the database
-func (m *DBModel) AllSpecialists() ([]*Specialist, error) {
+/*
+AllSpecialists returns all specialists from the database
+The function returns a slice of pointers to Specialist structs
+The function returns an error if there was an issue with the database
+*/
+func (m *DBModel) AllSpecialists() ([]*types.Specialist, error) {
 	stmt := `
 	SELECT id, name, specialty_id, location, address, url, telephone, email
 	FROM specialist
@@ -24,10 +19,10 @@ func (m *DBModel) AllSpecialists() ([]*Specialist, error) {
 	}
 	defer rows.Close()
 
-	var specialists []*Specialist
+	var specialists []*types.Specialist
 
 	for rows.Next() {
-		var s Specialist
+		var s types.Specialist
 		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		if err != nil {
 			return nil, err
@@ -42,11 +37,13 @@ func (m *DBModel) AllSpecialists() ([]*Specialist, error) {
 	return specialists, nil
 }
 
-// GetSpecialistBySpecialty returns all specialists from the database with a specific specialty
-// The specialtyID is the id of the specialty
-// The function returns a slice of pointers to Specialist structs
-// The function returns an error if there was an issue with the database
-func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*Specialist, error) {
+/*
+GetSpecialistBySpecialty returns all specialists from the database with a specific specialty
+The specialtyID is the id of the specialty
+The function returns a slice of pointers to Specialist structs
+The function returns an error if there was an issue with the database
+*/
+func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*types.Specialist, error) {
 	stmt := `
 	SELECT id, name, specialty_id, location, address, url, telephone, email
 	FROM specialist
@@ -59,10 +56,10 @@ func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*Specialist, erro
 	}
 	defer rows.Close()
 
-	var specialists []*Specialist
+	var specialists []*types.Specialist
 
 	for rows.Next() {
-		var s Specialist
+		var s types.Specialist
 		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		if err != nil {
 			return nil, err
@@ -83,7 +80,7 @@ The id is the id of the specialist
 The function returns a pointer to a Specialist struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) GetSpecialistByID(id int) (*Specialist, error) {
+func (m *DBModel) GetSpecialistByID(id int) (*types.Specialist, error) {
 	stmt := `
 	SELECT id, name, specialty_id, location, address, url, telephone, email
 	FROM specialist
@@ -92,7 +89,7 @@ func (m *DBModel) GetSpecialistByID(id int) (*Specialist, error) {
 
 	row := m.DB.QueryRow(stmt, id)
 
-	var s Specialist
+	var s types.Specialist
 	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 	if err != nil {
 		return nil, err
@@ -109,7 +106,7 @@ The userLocation is the location in WKT format
 The function returns a slice of pointers to Specialist structs
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, userLocation string) ([]*Specialist, error) {
+func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, userLocation string) ([]*types.Specialist, error) {
 	stmt := `
     SELECT id, name, specialty_id, location, address, url, telephone, email 
     FROM specialist 
@@ -122,10 +119,10 @@ func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, u
 	}
 	defer rows.Close()
 
-	var specialists []*Specialist
+	var specialists []*types.Specialist
 
 	for rows.Next() {
-		var s Specialist
+		var s types.Specialist
 		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		if err != nil {
 			return nil, err
@@ -145,7 +142,7 @@ InsertSpecialist inserts a new specialist into the database
 The s parameter is a Specialist struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) InsertSpecialist(s Specialist) error {
+func (m *DBModel) InsertSpecialist(s types.Specialist) error {
 	stmt := `
 	INSERT INTO specialist (name, specialty_id, location, address, url, telephone, email)
 	VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -175,7 +172,7 @@ UpdateSpecialist updates a specialist in the database
 The s parameter is a Specialist struct
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) UpdateSpecialist(s Specialist) error {
+func (m *DBModel) UpdateSpecialist(s types.Specialist) error {
 	stmt := `
 	UPDATE specialist
 	SET name=$1, specialty_id=$2, location=$3, address=$4, url=$5, telephone=$6, email=$7

@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/acornak/poc-gpt/handlers"
-	"github.com/acornak/poc-gpt/models"
+	"github.com/acornak/healthcare-poc/handlers"
+	"github.com/acornak/healthcare-poc/models"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,18 +17,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	_ "github.com/acornak/poc-gpt/docs"
+	_ "github.com/acornak/healthcare-poc/docs"
 	_ "github.com/lib/pq"
 )
 
-type Logger interface {
+type logger interface {
 	Info(msg string, fields ...zap.Field)
 	Fatal(msg string, fields ...zap.Field)
 }
 
-type Server struct {
+type server struct {
 	Router  *gin.Engine
-	Logger  Logger
+	Logger  logger
 	Handler *handlers.Handler
 }
 
@@ -92,40 +92,22 @@ func initializeDatabase(cfg *dbConfig, logger *zap.Logger) (*sql.DB, error) {
 	return nil, errors.New("failed to connect to the database")
 }
 
-func newServer(logger *zap.Logger, handler *handlers.Handler) *Server {
+func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
 	router := gin.Default()
-	s := &Server{Router: router, Logger: logger, Handler: handler}
+	s := &server{Router: router, Logger: logger, Handler: handler}
 
 	prefix := "/api/" + apiVersion
 
 	router.GET(prefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.POST(prefix+"/add", handler.Add)
+	router.POST(prefix+"/location", handler.GetWKTLocation)
+	router.POST(prefix+"/specialist", handler.FindSpecialist)
+	router.POST(prefix+"/specialties", handler.GetSpecialties)
 	router.POST(prefix+"/subtract", handler.Subtract)
 	router.POST(prefix+"/compute", handler.Compute)
 
 	return s
 }
-
-// func newApplication(cfg config, logger *zap.Logger, db *sql.DB) *application {
-// 	handler := &handlers.Handler{Logger: logger, Models: models.NewModels(db)}
-// 	router := gin.Default()
-// 	s := &Server{Router: router, Logger: logger, Handler: handler}
-
-// 	app := &application{
-// 		logger:     logger,
-// 		apiVersion: apiVersion,
-// 		server:     s,
-// 	}
-
-// 	prefix := "/api/" + apiVersion
-
-// 	router.GET(prefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-// 	router.POST(prefix+"/add", handler.Add)
-// 	router.POST(prefix+"/subtract", handler.Subtract)
-// 	router.POST(prefix+"/compute", handler.Compute)
-
-// 	return app
-// }
 
 func main() {
 	logger, err := zap.NewProduction()

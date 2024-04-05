@@ -21,6 +21,7 @@ services:
     depends_on:
       - healthcare-db
     environment:
+      - GEOCODE_API_KEY=
       - PORT=8080
       - DB_HOST=healthcare-db
       - DB_PORT=5432
