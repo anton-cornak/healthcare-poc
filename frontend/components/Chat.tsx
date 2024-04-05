@@ -32,6 +32,7 @@ export default function Chat() {
 	const handleUserMessage = async () => {
 		if (userMessage.trim() !== "") {
 			addMessage(userMessage, "user");
+			setUserMessage("");
 
 			const botResponse = await fetch("/api/chatbot", {
 				method: "POST",
@@ -39,8 +40,6 @@ export default function Chat() {
 			}).then((response) => response.json());
 
 			addMessage(botResponse.message, "bot");
-
-			setUserMessage("");
 		}
 	};
 

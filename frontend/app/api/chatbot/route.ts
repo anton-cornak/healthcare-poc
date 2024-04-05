@@ -1,7 +1,9 @@
 import functionDescription from "./functions";
 
-async function postOpenAI(messages: object[]): Promise<Response> {
-	const apiKey = process.env.OPENAI_API_KEY;
+async function postOpenAI(
+	apiKey: string,
+	messages: object[],
+): Promise<Response> {
 	const openAIURL = process.env.OPENAI_URL;
 
 	const body = {
@@ -46,13 +48,23 @@ export async function POST(req: Request): Promise<Response> {
 		});
 	}
 
+	const apiKey = process.env.OPENAI_API_KEY;
+	if (!apiKey) {
+		return new Response(
+			JSON.stringify({ message: "Error: OpenAI API key not set" }),
+			{
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			},
+		);
+	}
+
 	try {
-		const openAIResponse = await postOpenAI([
+		const openAIResponse = await postOpenAI(apiKey, [
 			{ role: "user", content: body.message },
 		]);
 		const { choices } = await openAIResponse.json();
 		const choice = choices[0];
-		console.log;
 
 		if (!choice || !choice.message) {
 			throw new Error("Invalid response from OpenAI");
@@ -77,7 +89,7 @@ export async function POST(req: Request): Promise<Response> {
 		const serverResult = await serverResponse.json();
 
 		// Return processed result back to the user
-		const finalResponse = await postOpenAI([
+		const finalResponse = await postOpenAI(apiKey, [
 			{ role: "user", content: body.message },
 			{
 				role: "assistant",

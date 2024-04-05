@@ -1,0 +1,18 @@
+version: "3"
+services:
+  healthcare-be:
+    container_name: healthcare-be
+    build:
+      context: ./go-server
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+  healthcare-fe:
+    container_name: healthcare-fe
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - OPENAI_API_KEY=
