@@ -14,13 +14,17 @@ COPY go.sum ./
 RUN go mod download
 
 # Copy the source from the current directory to the Working Directory inside the container
-COPY .env ./.env
+COPY .envrc ./.envrc
 COPY cmd/ ./cmd
 COPY docs/ ./docs
 COPY handlers/ ./handlers
+COPY models/ ./models
 
 # Build the Go app
 RUN go build -o main ./cmd
+
+# Run tests
+RUN go test ./...
 
 # Expose port 8080 to the outside world
 EXPOSE 8080

@@ -1,17 +1,24 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
+	"flag"
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/acornak/poc-gpt/handlers"
+	"github.com/acornak/poc-gpt/models"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/acornak/poc-gpt/docs"
+	_ "github.com/lib/pq"
 )
 
 type Logger interface {
@@ -25,18 +32,100 @@ type Server struct {
 	Handler *handlers.Handler
 }
 
-func NewServer(logger *zap.Logger) *Server {
+type config struct {
+	port   string
+	env    string
+	dbConn dbConfig
+}
+
+type dbConfig struct {
+	host     string
+	port     string
+	user     string
+	password string
+	dbname   string
+	sslmode  string
+}
+
+var apiVersion = "v1"
+
+func loadConfigFromEnv(cfg *config) error {
+	cfg.port = os.Getenv("PORT")
+	cfg.dbConn.host = os.Getenv("DB_HOST")
+	cfg.dbConn.port = os.Getenv("DB_PORT")
+	cfg.dbConn.user = os.Getenv("DB_USER")
+	cfg.dbConn.password = os.Getenv("DB_PASS")
+	cfg.dbConn.dbname = os.Getenv("DB_NAME")
+	cfg.dbConn.sslmode = os.Getenv("SSL_MODE")
+
+	return validateConfig(cfg)
+}
+
+func initializeDatabase(cfg *dbConfig, logger *zap.Logger) (*sql.DB, error) {
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		cfg.host, cfg.port, cfg.user, cfg.password, cfg.dbname, cfg.sslmode)
+
+	var db *sql.DB
+	var err error
+
+	deadline := time.Now().Add(5 * time.Minute)
+
+	for attempts := 0; time.Now().Before(deadline); attempts++ {
+		db, err = sql.Open("postgres", connStr)
+		if err != nil {
+			logger.Error("Error opening database connection", zap.Error(err))
+			time.Sleep(time.Second * 5)
+			continue
+		}
+
+		err = db.Ping()
+		if err != nil {
+			logger.Error("Database ping failed", zap.String("attempt", fmt.Sprintf("%d", attempts+1)), zap.Error(err))
+			db.Close()
+			time.Sleep(time.Second * 5)
+		} else {
+			logger.Info("Successfully connected to the database")
+			return db, nil
+		}
+	}
+
+	return nil, errors.New("failed to connect to the database")
+}
+
+func newServer(logger *zap.Logger, handler *handlers.Handler) *Server {
 	router := gin.Default()
-	handler := &handlers.Handler{Logger: logger}
 	s := &Server{Router: router, Logger: logger, Handler: handler}
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.POST("/add", handler.Add)
-	router.POST("/subtract", handler.Subtract)
-	router.POST("/compute", handler.Compute)
+	prefix := "/api/" + apiVersion
+
+	router.GET(prefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.POST(prefix+"/add", handler.Add)
+	router.POST(prefix+"/subtract", handler.Subtract)
+	router.POST(prefix+"/compute", handler.Compute)
 
 	return s
 }
+
+// func newApplication(cfg config, logger *zap.Logger, db *sql.DB) *application {
+// 	handler := &handlers.Handler{Logger: logger, Models: models.NewModels(db)}
+// 	router := gin.Default()
+// 	s := &Server{Router: router, Logger: logger, Handler: handler}
+
+// 	app := &application{
+// 		logger:     logger,
+// 		apiVersion: apiVersion,
+// 		server:     s,
+// 	}
+
+// 	prefix := "/api/" + apiVersion
+
+// 	router.GET(prefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+// 	router.POST(prefix+"/add", handler.Add)
+// 	router.POST(prefix+"/subtract", handler.Subtract)
+// 	router.POST(prefix+"/compute", handler.Compute)
+
+// 	return app
+// }
 
 func main() {
 	logger, err := zap.NewProduction()
@@ -50,9 +139,29 @@ func main() {
 		}
 	}()
 
-	if err := godotenv.Load(); err != nil {
-		logger.Fatal("Failed to load env variables: %v\n", zap.Error(err))
+	var cfg config
+	flag.StringVar(&cfg.env, "ENV", "develop", "Application environment")
+	flag.Parse()
+
+	if cfg.env == "develop" {
+		err := godotenv.Load(".envrc")
+		if err != nil {
+			fmt.Println("failed to load env vars:", err)
+			os.Exit(1)
+		}
 	}
+
+	err = loadConfigFromEnv(&cfg)
+	if err != nil {
+		fmt.Println("failed to load config:", err)
+		os.Exit(1)
+	}
+
+	db, err := initializeDatabase(&cfg.dbConn, logger)
+	if err != nil {
+		logger.Fatal("failed to connect to DB:", zap.Error(err))
+	}
+	defer db.Close()
 
 	ginMode := os.Getenv("GIN_MODE")
 	if ginMode == "" {
@@ -61,7 +170,7 @@ func main() {
 	}
 	gin.SetMode(ginMode)
 
-	server := NewServer(logger)
+	s := newServer(logger, &handlers.Handler{Logger: logger, Models: models.NewModels(db)})
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -69,7 +178,7 @@ func main() {
 		logger.Info("PORT not found in env, using 8080 as default")
 	}
 
-	if err := server.Router.Run(":" + port); err != nil {
-		server.Logger.Fatal("Couldn't start server: %v\n", zap.Error(err))
+	if err := s.Router.Run(":" + port); err != nil {
+		logger.Fatal("Failed to start server", zap.Error(err))
 	}
 }

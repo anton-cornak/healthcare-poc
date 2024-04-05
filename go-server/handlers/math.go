@@ -7,18 +7,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type Handler struct {
-	Logger *zap.Logger
-}
-
-type SuccessResponse struct {
-	Result float64 `json:"result"`
-}
-
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 type AddPayload struct {
 	Numbers []float64 `json:"numbers"`
 }

@@ -1,5 +1,16 @@
 version: "3"
 services:
+  healthcare-db:
+    container_name: healthcare-db
+    image: postgis/postgis:latest
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=healthcare-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   healthcare-be:
     container_name: healthcare-be
     build:
@@ -7,6 +18,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
+    depends_on:
+      - healthcare-db
+    environment:
+      - PORT=8080
+      - DB_HOST=healthcare-db
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=healthcare-db
+      - SSL_MODE=disable
   healthcare-fe:
     container_name: healthcare-fe
     build:
