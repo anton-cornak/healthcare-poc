@@ -1,16 +1,47 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
 	id: number;
 	text: string;
 	sender: "user" | "bot";
+	isMarkdown?: boolean;
+}
+
+function formatDoctorInfo(text: string): string {
+	// Split the text by the pattern that indicates a new doctor entry, which in this case is a digit followed by a period and a space.
+	const doctorEntries = text
+		.split(/\d\. \*\*/)
+		.filter((entry) => entry.trim() !== "");
+
+	// Prefix that will be added before each doctor's name to maintain the markdown bold syntax after splitting
+	const prefix = "**";
+
+	// Process each entry to ensure it's formatted on a new line
+	const formattedEntries = doctorEntries.map((entry, index) => {
+		// Re-add the markdown bold syntax for the doctor's name
+		const formattedEntry = `${index + 1}. ${prefix}${entry.trim()}`;
+
+		// Replace the spaces after "Address:", "Phone:", "Email:", and "Website:" with newlines for readability
+		return formattedEntry
+			.replace(/Address:/g, "\n\n   Adresa:")
+			.replace(/Phone:/g, "\n\n   Telefónne číslo:")
+			.replace(/Email:/g, "\n\n   Email:")
+			.replace(/Website:/g, "\n\n   Webová stránka:");
+	});
+
+	// Join the processed entries back into a single string, each entry separated by two newlines for clear separation
+	return formattedEntries.join("\n\n").substring(5);
 }
 
 export default function Chat() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [userMessage, setUserMessage] = useState<string>("");
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+	const containsMarkdown = (text: string) =>
+		text.includes("**") || text.includes("[");
 
 	useEffect(() => {
 		setMessages([
@@ -20,12 +51,26 @@ export default function Chat() {
 				sender: "bot",
 			},
 		]);
+		// const text =
+		// 	"Našiel som pre vás niekoľko ortopédov v Košiciach: 1. **Dr. Anton Cornak** Address: Dr. Anton Cornak Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 2. **Dr. Antonin Cornak** Address: Dr. Antonin Cornak Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 3. **Dr. Matka Kresna** Address: Dr. Matka Kresna Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 4. **Dr. Zidan Sufurki** Address: Dr. Zidan Sufurki Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 5. **Dr. David Sufuski** Address: Dr. David Sufuski Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) Máte záujem o ďalšie informácie alebo mám pre vás vykonať ďalšiu službu?";
+		// setMessages([
+		// 	{
+		// 		id: Date.now(),
+		// 		text: formatDoctorInfo(text),
+		// 		sender: "bot",
+		// 		isMarkdown: containsMarkdown(text),
+		// 	},
+		// ]);
 	}, []);
 
-	const addMessage = (text: string, sender: "user" | "bot") => {
+	const addMessage = (
+		text: string,
+		sender: "user" | "bot",
+		isMarkdown: boolean = false,
+	) => {
 		setMessages((prevMessages) => [
 			...prevMessages,
-			{ id: Date.now(), text, sender },
+			{ id: Date.now(), text, sender, isMarkdown },
 		]);
 	};
 
@@ -39,7 +84,12 @@ export default function Chat() {
 				body: JSON.stringify({ message: userMessage }),
 			}).then((response) => response.json());
 
-			addMessage(botResponse.message, "bot");
+			const isMarkdown = containsMarkdown(botResponse.message);
+			addMessage(
+				formatDoctorInfo(botResponse.message),
+				"bot",
+				isMarkdown,
+			);
 		}
 	};
 
@@ -79,7 +129,13 @@ export default function Chat() {
 										: "bg-gray-300 text-black"
 								}`}
 							>
-								{message.text}
+								{message.isMarkdown ? (
+									<ReactMarkdown>
+										{message.text}
+									</ReactMarkdown>
+								) : (
+									message.text
+								)}
 							</div>
 						</div>
 					))}
