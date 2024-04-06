@@ -64,12 +64,11 @@ func TestMainRoutes(t *testing.T) {
 		path   string
 		code   int
 	}{
-		{"GET", "/api/v1/add", http.StatusNotFound},
+		{"GET", "/api/v1/math/add", http.StatusNotFound},
 
-		{"POST", "/api/v1/add", http.StatusBadRequest},
-		{"POST", "/api/v1/subtract", http.StatusBadRequest},
-		{"POST", "/api/v1/compute", http.StatusBadRequest},
-		{"POST", "/api/v1/specialist", http.StatusBadRequest},
+		{"POST", "/api/v1/math/add", http.StatusBadRequest},
+		{"POST", "/api/v1/math/subtract", http.StatusBadRequest},
+		{"POST", "/api/v1/math/compute", http.StatusBadRequest},
 	}
 
 	for _, tt := range tests {

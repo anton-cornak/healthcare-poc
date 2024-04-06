@@ -1,10 +1,13 @@
+// OpenAI returns 'specialties/all' does not match '^[a-zA-Z0-9_-]{1,64}$'
+const functionMapping: { [key: string]: string } = {
+	"location-wkt": "location/wkt",
+	"specialties-all": "specialties/all",
+	"specialist-find": "specialist/find",
+};
+
 const functionDescription = [
 	{
-		name: "specialties",
-		description: "Gets list of all specialties in the database",
-	},
-	{
-		name: "location",
+		name: "location-wkt",
 		description:
 			"Generates WKT representation of a location from a string representation of the location",
 		parameters: {
@@ -22,7 +25,11 @@ const functionDescription = [
 		},
 	},
 	{
-		name: "specialist",
+		name: "specialties-all",
+		description: "Gets list of all specialties in the database",
+	},
+	{
+		name: "specialist-find",
 		description:
 			"Gets a specialist from the database by the user defined preferences, such as specialty, location and distance from the user",
 		parameters: {
@@ -51,4 +58,4 @@ const functionDescription = [
 	},
 ];
 
-export default functionDescription;
+export { functionDescription, functionMapping };

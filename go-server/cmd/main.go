@@ -99,13 +99,22 @@ func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
 
 	prefix := "/api/" + apiVersion
 
+	// Documentation
 	router.GET(prefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.POST(prefix+"/add", handler.Add)
-	router.POST(prefix+"/location", handler.GetWKTLocation)
-	router.POST(prefix+"/specialist", handler.FindSpecialist)
-	router.POST(prefix+"/specialties", handler.GetSpecialties)
-	router.POST(prefix+"/subtract", handler.Subtract)
-	router.POST(prefix+"/compute", handler.Compute)
+
+	// Math
+	router.POST(prefix+"/math/add", handler.Add)
+	router.POST(prefix+"/math/subtract", handler.Subtract)
+	router.POST(prefix+"/math/compute", handler.Compute)
+
+	// Location
+	router.POST(prefix+"/location/wkt", handler.GetWKTLocation)
+
+	// Specialist
+	router.POST(prefix+"/specialist/find", handler.FindSpecialist)
+
+	// Specialties
+	router.POST(prefix+"/specialties/all", handler.GetSpecialties)
 
 	return s
 }

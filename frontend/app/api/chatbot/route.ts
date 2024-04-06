@@ -1,4 +1,4 @@
-import functionDescription from "./functions";
+import { functionDescription, functionMapping } from "./functions";
 
 async function postOpenAI(
 	apiKey: string,
@@ -27,12 +27,13 @@ async function postOpenAI(
 
 async function postToServer(endpoint: string, body: string): Promise<Response> {
 	const serverURL = process.env.SERVER_URL;
+	const endpointMap = functionMapping[endpoint] || endpoint;
 
 	const headers = {
 		"Content-Type": "application/json",
 	};
 
-	return fetch(`${serverURL}/${endpoint}`, {
+	return fetch(`${serverURL}/${endpointMap}`, {
 		method: "POST",
 		headers,
 		body: body,

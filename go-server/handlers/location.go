@@ -48,8 +48,6 @@ func (h *Handler) GetWKTLocation(c *gin.Context) {
 		return
 	}
 
-	h.Logger.Info("Generating WKT location", zap.Any("payload", payload))
-
 	apiKey := os.Getenv("GEOCODE_API_KEY")
 	if apiKey == "" {
 		h.Logger.Error("API key is required")

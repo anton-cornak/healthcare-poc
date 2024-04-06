@@ -6,7 +6,6 @@ import (
 
 	"github.com/acornak/healthcare-poc/types"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type FindSpecialistPayload struct {
@@ -54,8 +53,6 @@ func (h *Handler) FindSpecialist(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errResp)
 		return
 	}
-
-	h.Logger.Info("Finding specialist", zap.Any("payload", payload))
 
 	specialists, err := h.Models.DB.GetSpecialistBySpecialtyAndLocation(payload.SpecialtyId, payload.Radius, payload.UserLocation)
 	if err != nil {
