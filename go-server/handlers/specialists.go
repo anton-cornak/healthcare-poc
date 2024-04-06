@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/acornak/healthcare-poc/types"
 	"github.com/gin-gonic/gin"
@@ -25,8 +26,8 @@ type FindSpecialistResponse struct {
 // @Produce		json
 // @Param		payload	body		FindSpecialistPayload	true	"Specialty, radius, and user location"
 // @Success		200		{object}	SuccessResponse
-// @Failure		400		{object}	ErrorResponse
-// @Router		/find-specialist [post]
+// @Failure		500		{object}	ErrorResponse
+// @Router		/specialist [post]
 func (h *Handler) FindSpecialist(c *gin.Context) {
 	var payload FindSpecialistPayload
 	var errResp ErrorResponse
@@ -37,12 +38,29 @@ func (h *Handler) FindSpecialist(c *gin.Context) {
 		return
 	}
 
+	missingParams := []string{}
+	if payload.SpecialtyId == 0 {
+		missingParams = append(missingParams, "specialty_id")
+	}
+	if payload.Radius == 0 {
+		missingParams = append(missingParams, "radius")
+	}
+	if payload.UserLocation == "" {
+		missingParams = append(missingParams, "user_location")
+	}
+
+	if len(missingParams) > 0 {
+		errResp.Error = "Invalid payload: missing " + strings.Join(missingParams, ", ")
+		c.JSON(http.StatusBadRequest, errResp)
+		return
+	}
+
 	h.Logger.Info("Finding specialist", zap.Any("payload", payload))
 
 	specialists, err := h.Models.DB.GetSpecialistBySpecialtyAndLocation(payload.SpecialtyId, payload.Radius, payload.UserLocation)
 	if err != nil {
-		errResp.Error = "Specialists not found"
-		c.JSON(http.StatusNotFound, errResp)
+		errResp.Error = err.Error()
+		c.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 

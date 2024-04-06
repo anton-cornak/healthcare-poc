@@ -9,6 +9,45 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestAllSpecialties_SqlError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT (.+) FROM specialty`).WithoutArgs().WillReturnError(errors.New("mocked error"))
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.AllSpecialties()
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "mocked error")
+	assert.Nil(t, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAllSpecialties_RowsScanError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "description"}).AddRow(1, "test", "test")
+	rows.RowError(0, errors.New("rows scan error"))
+
+	mock.ExpectQuery("SELECT (.+) FROM specialty").WithoutArgs().WillReturnRows(rows)
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.AllSpecialties()
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "rows scan error")
+	assert.Nil(t, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 func TestAllSpecialties_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -36,17 +75,17 @@ func TestAllSpecialties_Success(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestAllSpecialties_Error(t *testing.T) {
+func TestGetSpecialtyByID_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
 	}
 	defer db.Close()
 
-	mock.ExpectQuery(`SELECT (.+) FROM specialty`).WithoutArgs().WillReturnError(errors.New("mocked error"))
+	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE id=\$1`).WithArgs(1).WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialties()
+	res, err := modelsDB.DB.GetSpecialtyByID(1)
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
@@ -79,21 +118,25 @@ func TestGetSpecialtyByID_Success(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestGetSpecialtyByID_Error(t *testing.T) {
+func TestInsertSpecialty_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
 	}
 	defer db.Close()
 
-	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE id=\$1`).WithArgs(1).WillReturnError(errors.New("mocked error"))
+	s := types.Specialty{
+		Name:        "test",
+		Description: "test",
+	}
+
+	mock.ExpectExec("INSERT INTO specialty").WithArgs(s.Name, s.Description).WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.GetSpecialtyByID(1)
+	err = modelsDB.DB.InsertSpecialty(s)
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
-	assert.Nil(t, res)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -118,22 +161,17 @@ func TestInsertSpecialty_Success(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestInsertSpecialty_Error(t *testing.T) {
+func TestDeleteSpecialty_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
 	}
 	defer db.Close()
 
-	s := types.Specialty{
-		Name:        "test",
-		Description: "test",
-	}
-
-	mock.ExpectExec("INSERT INTO specialty").WithArgs(s.Name, s.Description).WillReturnError(errors.New("mocked error"))
+	mock.ExpectExec("DELETE FROM specialties").WithArgs(1).WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	err = modelsDB.DB.InsertSpecialty(s)
+	err = modelsDB.DB.DeleteSpecialty(1)
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
@@ -156,17 +194,23 @@ func TestDeleteSpecialty_Success(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestDeleteSpecialty_Error(t *testing.T) {
+func TestUpdateSpecialty_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
 	}
 	defer db.Close()
 
-	mock.ExpectExec("DELETE FROM specialties").WithArgs(1).WillReturnError(errors.New("mocked error"))
+	s := types.Specialty{
+		ID:          1,
+		Name:        "test",
+		Description: "test",
+	}
+
+	mock.ExpectExec(`UPDATE specialty SET name=\$1, description=\$2 WHERE id=\$3`).WithArgs(s.Name, s.Description, s.ID).WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	err = modelsDB.DB.DeleteSpecialty(1)
+	err = modelsDB.DB.UpdateSpecialty(s)
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
@@ -192,28 +236,5 @@ func TestUpdateSpecialty_Success(t *testing.T) {
 	err = modelsDB.DB.UpdateSpecialty(s)
 
 	assert.NoError(t, err)
-	assert.NoError(t, mock.ExpectationsWereMet())
-}
-
-func TestUpdateSpecialty_Error(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("failed to open sqlmock database: %s", err)
-	}
-	defer db.Close()
-
-	s := types.Specialty{
-		ID:          1,
-		Name:        "test",
-		Description: "test",
-	}
-
-	mock.ExpectExec(`UPDATE specialty SET name=\$1, description=\$2 WHERE id=\$3`).WithArgs(s.Name, s.Description, s.ID).WillReturnError(errors.New("mocked error"))
-
-	modelsDB := NewModels(db)
-	err = modelsDB.DB.UpdateSpecialty(s)
-
-	assert.Error(t, err)
-	assert.EqualError(t, err, "mocked error")
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

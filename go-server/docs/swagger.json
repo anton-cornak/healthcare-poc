@@ -82,6 +82,109 @@
                 }
             }
         },
+        "/location": {
+            "post": {
+                "description": "Get the WKT location based on the user's location",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get WKT location",
+                "operationId": "location",
+                "parameters": [
+                    {
+                        "description": "User location",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetWKTLocationPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specialist": {
+            "post": {
+                "description": "Find a specialist based on the user's location, specialty, and radius",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find specialist",
+                "operationId": "find-specialist",
+                "parameters": [
+                    {
+                        "description": "Specialty, radius, and user location",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.FindSpecialistPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specialties": {
+            "post": {
+                "description": "Get all specialties",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get specialties",
+                "operationId": "specialties",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetSpecialtiesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/subtract": {
             "post": {
                 "description": "Subtract all numbers in the 'subtract' list from the 'number'.",
@@ -102,7 +205,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.SubstractPayload"
+                            "$ref": "#/definitions/handlers.SubtractPayload"
                         }
                     }
                 ],
@@ -160,7 +263,40 @@
                 }
             }
         },
-        "handlers.SubstractPayload": {
+        "handlers.FindSpecialistPayload": {
+            "type": "object",
+            "properties": {
+                "radius": {
+                    "type": "integer"
+                },
+                "specialty_id": {
+                    "type": "integer"
+                },
+                "user_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetSpecialtiesResponse": {
+            "type": "object",
+            "properties": {
+                "specialties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Specialty"
+                    }
+                }
+            }
+        },
+        "handlers.GetWKTLocationPayload": {
+            "type": "object",
+            "properties": {
+                "user_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.SubtractPayload": {
             "type": "object",
             "properties": {
                 "number": {
@@ -179,6 +315,20 @@
             "properties": {
                 "result": {
                     "type": "number"
+                }
+            }
+        },
+        "types.Specialty": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }

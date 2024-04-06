@@ -23,10 +23,7 @@ func (m *DBModel) AllReviews() ([]*types.Review, error) {
 
 	for rows.Next() {
 		var s types.Review
-		err = rows.Scan(&s.ID, &s.SpecialistId, &s.Url, &s.Rating, &s.Comment)
-		if err != nil {
-			return nil, err
-		}
+		rows.Scan(&s.ID, &s.SpecialistId, &s.Url, &s.Rating, &s.Comment)
 		reviews = append(reviews, &s)
 	}
 

@@ -36,7 +36,7 @@ func (h *Handler) Add(c *gin.Context) {
 	}
 
 	if len(payload.Numbers) == 0 {
-		errResp.Error = "Missing 'numbers' field in the payload"
+		errResp.Error = "Invalid payload: missing numbers field"
 		c.JSON(http.StatusBadRequest, errResp)
 		return
 	}
@@ -55,7 +55,7 @@ func (h *Handler) Add(c *gin.Context) {
 	c.JSON(http.StatusOK, successResp)
 }
 
-type SubstractPayload struct {
+type SubtractPayload struct {
 	Number   float64   `json:"number"`
 	Subtract []float64 `json:"subtract"`
 }
@@ -67,12 +67,12 @@ type SubstractPayload struct {
 //	@Tags			Math Operations
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body		SubstractPayload	true	"Numbers to substract from the 'number'"
+//	@Param			payload	body		SubtractPayload	true	"Numbers to substract from the 'number'"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Router			/subtract [post]
 func (h *Handler) Subtract(c *gin.Context) {
-	var payload SubstractPayload
+	var payload SubtractPayload
 	var errResp ErrorResponse
 	var successResp SuccessResponse
 
@@ -85,6 +85,12 @@ func (h *Handler) Subtract(c *gin.Context) {
 	result := payload.Number
 	for _, num := range payload.Subtract {
 		result -= num
+	}
+
+	if len(payload.Subtract) == 0 {
+		errResp.Error = "Invalid payload: missing subtract field"
+		c.JSON(http.StatusBadRequest, errResp)
+		return
 	}
 
 	h.Logger.Info("Endpoint /compute called",
@@ -119,6 +125,12 @@ func (h *Handler) Compute(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		errResp.Error = "Invalid JSON payload"
+		c.JSON(http.StatusBadRequest, errResp)
+		return
+	}
+
+	if len(payload.Add) == 0 && len(payload.Subtract) == 0 {
+		errResp.Error = "Invalid payload: missing add and subtract fields"
 		c.JSON(http.StatusBadRequest, errResp)
 		return
 	}

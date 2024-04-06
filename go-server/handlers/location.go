@@ -25,13 +25,13 @@ type GetWKTLocationResponse struct {
 
 // @Summary		Get WKT location
 // @Description	Get the WKT location based on the user's location
-// @ID			get-wkt-location
+// @ID			location
 // @Accept		json
 // @Produce		json
 // @Param		payload	body		GetWKTLocationPayload	true	"User location"
 // @Success		200		{object}	SuccessResponse
 // @Failure		400		{object}	ErrorResponse
-// @Router		/get-wkt-location [post]
+// @Router		/location [post]
 func (h *Handler) GetWKTLocation(c *gin.Context) {
 	var payload GetWKTLocationPayload
 	var errResp ErrorResponse
@@ -42,50 +42,53 @@ func (h *Handler) GetWKTLocation(c *gin.Context) {
 		return
 	}
 
+	if payload.UserLocation == "" {
+		errResp.Error = "Invalid payload: missing user_location field"
+		c.JSON(http.StatusBadRequest, errResp)
+		return
+	}
+
 	h.Logger.Info("Generating WKT location", zap.Any("payload", payload))
 
 	apiKey := os.Getenv("GEOCODE_API_KEY")
 	if apiKey == "" {
 		h.Logger.Error("API key is required")
-		errResp.Error = "API key is required"
-		c.JSON(http.StatusBadRequest, errResp)
+		errResp.Error = "Something went wrong, please try again later"
+		c.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
 	geocodeURL := fmt.Sprintf("https://geocode.maps.co/search?q=%s&api_key=%s", payload.UserLocation, apiKey)
-	geocodeResp, err := http.Get(geocodeURL)
+	geocodeResp, err := h.Get(geocodeURL)
 	if err != nil {
-		h.Logger.Error("Failed to get geocode response", zap.Error(err))
-		errResp.Error = "Failed to get geocode response"
+		h.Logger.Error("Failed to get geocode location", zap.Error(err))
+		errResp.Error = "Failed to get geocode location"
+		c.JSON(http.StatusInternalServerError, errResp)
+		return
+	}
+
+	if geocodeResp.StatusCode != http.StatusOK {
+		h.Logger.Error("Failed to get geocode location", zap.Any("status_code", geocodeResp.StatusCode))
+		errResp.Error = "Failed to get geocode location"
 		c.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	defer geocodeResp.Body.Close()
 
-	if geocodeResp.StatusCode != http.StatusOK {
-		h.Logger.Error("Failed to get geocode response", zap.Any("status_code", geocodeResp.StatusCode))
-		errResp.Error = "Failed to get geocode response"
-		c.JSON(http.StatusInternalServerError, errResp)
-		return
-	}
-
 	var geocodeData []locationResult
 	if err := json.NewDecoder(geocodeResp.Body).Decode(&geocodeData); err != nil {
 		h.Logger.Error("Failed to decode geocode response", zap.Error(err))
-		errResp.Error = "Failed to decode geocode response"
+		errResp.Error = "Failed to get geocode location"
 		c.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
 	if len(geocodeData) == 0 {
-		h.Logger.Error("No geocode data found")
-		errResp.Error = "No geocode data found"
-		c.JSON(http.StatusNotFound, errResp)
+		h.Logger.Error("No geocode data found for the location", zap.Any("location", payload.UserLocation))
+		errResp.Error = "No geocode data found for the location provided"
+		c.JSON(http.StatusOK, errResp)
 		return
 	}
 
-	firstResult := geocodeData[0]
-	wktLocation := fmt.Sprintf("POINT(%s %s)", firstResult.Lon, firstResult.Lat)
-
-	c.JSON(http.StatusOK, GetWKTLocationResponse{WKTLocation: wktLocation})
+	c.JSON(http.StatusOK, GetWKTLocationResponse{WKTLocation: fmt.Sprintf("POINT(%s %s)", geocodeData[0].Lon, geocodeData[0].Lat)})
 }

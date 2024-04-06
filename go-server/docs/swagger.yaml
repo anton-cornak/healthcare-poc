@@ -22,7 +22,28 @@ definitions:
       error:
         type: string
     type: object
-  handlers.SubstractPayload:
+  handlers.FindSpecialistPayload:
+    properties:
+      radius:
+        type: integer
+      specialty_id:
+        type: integer
+      user_location:
+        type: string
+    type: object
+  handlers.GetSpecialtiesResponse:
+    properties:
+      specialties:
+        items:
+          $ref: '#/definitions/types.Specialty'
+        type: array
+    type: object
+  handlers.GetWKTLocationPayload:
+    properties:
+      user_location:
+        type: string
+    type: object
+  handlers.SubtractPayload:
     properties:
       number:
         type: number
@@ -35,6 +56,15 @@ definitions:
     properties:
       result:
         type: number
+    type: object
+  types.Specialty:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -91,6 +121,75 @@ paths:
       summary: Compute result
       tags:
       - Math Operations
+  /location:
+    post:
+      consumes:
+      - application/json
+      description: Get the WKT location based on the user's location
+      operationId: location
+      parameters:
+      - description: User location
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.GetWKTLocationPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get WKT location
+  /specialist:
+    post:
+      consumes:
+      - application/json
+      description: Find a specialist based on the user's location, specialty, and
+        radius
+      operationId: find-specialist
+      parameters:
+      - description: Specialty, radius, and user location
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.FindSpecialistPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Find specialist
+  /specialties:
+    post:
+      consumes:
+      - application/json
+      description: Get all specialties
+      operationId: specialties
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetSpecialtiesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get specialties
   /subtract:
     post:
       consumes:
@@ -102,7 +201,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/handlers.SubstractPayload'
+          $ref: '#/definitions/handlers.SubtractPayload'
       produces:
       - application/json
       responses:

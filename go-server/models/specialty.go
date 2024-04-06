@@ -23,10 +23,7 @@ func (m *DBModel) AllSpecialties() ([]*types.Specialty, error) {
 
 	for rows.Next() {
 		var s types.Specialty
-		err = rows.Scan(&s.ID, &s.Name, &s.Description)
-		if err != nil {
-			return nil, err
-		}
+		rows.Scan(&s.ID, &s.Name, &s.Description)
 		specialties = append(specialties, &s)
 	}
 

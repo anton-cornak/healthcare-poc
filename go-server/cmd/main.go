@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -152,7 +153,11 @@ func main() {
 	}
 	gin.SetMode(ginMode)
 
-	s := newServer(logger, &handlers.Handler{Logger: logger, Models: models.NewModels(db)})
+	s := newServer(logger, &handlers.Handler{
+		Logger: logger,
+		Models: models.NewModels(db),
+		Get:    http.Get,
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -23,10 +23,7 @@ func (m *DBModel) AllSpecialists() ([]*types.Specialist, error) {
 
 	for rows.Next() {
 		var s types.Specialist
-		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
-		if err != nil {
-			return nil, err
-		}
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		specialists = append(specialists, &s)
 	}
 
@@ -60,10 +57,7 @@ func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*types.Specialist
 
 	for rows.Next() {
 		var s types.Specialist
-		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
-		if err != nil {
-			return nil, err
-		}
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		specialists = append(specialists, &s)
 	}
 
@@ -123,10 +117,7 @@ func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, u
 
 	for rows.Next() {
 		var s types.Specialist
-		err = rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
-		if err != nil {
-			return nil, err
-		}
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 		specialists = append(specialists, &s)
 	}
 
