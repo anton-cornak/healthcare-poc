@@ -43,7 +43,7 @@ async function postToServer(endpoint: string, body: string): Promise<Response> {
 export async function POST(req: Request): Promise<Response> {
 	const body = await req.json();
 
-	if (!body.message) {
+	if (!body.conversation) {
 		return new Response(JSON.stringify({ message: "Bad request" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
@@ -63,11 +63,17 @@ export async function POST(req: Request): Promise<Response> {
 
 	let iterations = 0;
 	const maxIterations = 10;
-	const conversations: object[] = [{ role: "user", content: body.message }];
+	const conversations: object[] = body.conversation;
 
 	try {
 		while (iterations < maxIterations) {
 			const openAIResponse = await postOpenAI(apiKey, conversations);
+
+			if (!openAIResponse.ok) {
+				const openAIResponseJSON = await openAIResponse.json();
+				console.log("OpenAI Response:", openAIResponseJSON);
+			}
+
 			const { choices } = await openAIResponse.json();
 			const choice = choices[0];
 

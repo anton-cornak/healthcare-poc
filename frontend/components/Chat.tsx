@@ -3,10 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
-	id: number;
-	text: string;
-	sender: "user" | "bot";
-	isMarkdown?: boolean;
+	content: string;
+	role: "user" | "assistant";
 }
 
 function formatDoctorInfo(text: string): string {
@@ -46,50 +44,36 @@ export default function Chat() {
 	useEffect(() => {
 		setMessages([
 			{
-				id: Date.now(),
-				text: "Dobrý deň. Moje meno je Zidan Sufurki a som váš asistent. Mojou úlohou je pomôcť Vám pri hľadaní lekára vo vašom okolí. Na začiatok mi, prosím, napíšte, akého lekára hľadáte a kde sa nachádzate.",
-				sender: "bot",
+				content:
+					"Dobrý deň. Moje meno je Zidan Sufurki a som váš asistent. Mojou úlohou je pomôcť Vám pri hľadaní lekára vo vašom okolí. Na začiatok mi, prosím, napíšte, akého lekára hľadáte a kde sa nachádzate.",
+				role: "assistant",
 			},
 		]);
-		// const text =
-		// 	"Našiel som pre vás niekoľko ortopédov v Košiciach: 1. **Dr. Anton Cornak** Address: Dr. Anton Cornak Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 2. **Dr. Antonin Cornak** Address: Dr. Antonin Cornak Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 3. **Dr. Matka Kresna** Address: Dr. Matka Kresna Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 4. **Dr. Zidan Sufurki** Address: Dr. Zidan Sufurki Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) 5. **Dr. David Sufuski** Address: Dr. David Sufuski Phone: 707 Bone Blvd, Orthopedics City, OC 09876 Email: 654-987-0123 Website: [julia.carter@example.com](mailto:julia.carter@example.com) Máte záujem o ďalšie informácie alebo mám pre vás vykonať ďalšiu službu?";
-		// setMessages([
-		// 	{
-		// 		id: Date.now(),
-		// 		text: formatDoctorInfo(text),
-		// 		sender: "bot",
-		// 		isMarkdown: containsMarkdown(text),
-		// 	},
-		// ]);
 	}, []);
 
-	const addMessage = (
-		text: string,
-		sender: "user" | "bot",
-		isMarkdown: boolean = false,
-	) => {
-		setMessages((prevMessages) => [
-			...prevMessages,
-			{ id: Date.now(), text, sender, isMarkdown },
-		]);
+	const addMessage = (content: string, role: "user" | "assistant") => {
+		setMessages((prevMessages) => [...prevMessages, { content, role }]);
 	};
 
 	const handleUserMessage = async () => {
 		if (userMessage.trim() !== "") {
+			const newMessage: Message = {
+				content: userMessage,
+				role: "user",
+			};
+			const updatedMessages = [...messages, newMessage];
 			addMessage(userMessage, "user");
 			setUserMessage("");
 
 			const botResponse = await fetch("/api/chatbot", {
 				method: "POST",
-				body: JSON.stringify({ message: userMessage }),
+				body: JSON.stringify({
+					message: userMessage,
+					conversation: updatedMessages,
+				}),
 			}).then((response) => response.json());
 
-			const isMarkdown = containsMarkdown(botResponse.message);
-			addMessage(
-				formatDoctorInfo(botResponse.message),
-				"bot",
-				isMarkdown,
-			);
+			addMessage(formatDoctorInfo(botResponse.message), "assistant");
 		}
 	};
 
@@ -115,26 +99,26 @@ export default function Chat() {
 				>
 					{messages.map((message) => (
 						<div
-							key={message.id}
+							key={message.content}
 							className={`mb-2 flex ${
-								message.sender === "user"
+								message.role === "user"
 									? "justify-end"
 									: "justify-start"
 							}`}
 						>
 							<div
 								className={`rounded px-4 py-2 ${
-									message.sender === "user"
+									message.role === "user"
 										? "bg-blue-500 text-white"
 										: "bg-gray-300 text-black"
 								}`}
 							>
-								{message.isMarkdown ? (
+								{containsMarkdown(message.content) ? (
 									<ReactMarkdown>
-										{message.text}
+										{message.content}
 									</ReactMarkdown>
 								) : (
-									message.text
+									message.content
 								)}
 							</div>
 						</div>

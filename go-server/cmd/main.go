@@ -83,7 +83,7 @@ func initializeDatabase(cfg *dbConfig, logger *zap.Logger) (*sql.DB, error) {
 		if err != nil {
 			logger.Error("Database ping failed", zap.String("attempt", fmt.Sprintf("%d", attempts+1)), zap.Error(err))
 			db.Close()
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 2)
 		} else {
 			logger.Info("Successfully connected to the database")
 			return db, nil
@@ -112,6 +112,7 @@ func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
 
 	// Specialist
 	router.POST(prefix+"/specialist/find", handler.FindSpecialist)
+	// closest specialist
 
 	// Specialties
 	router.POST(prefix+"/specialties/all", handler.GetSpecialties)
