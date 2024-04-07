@@ -36,6 +36,7 @@ function formatDoctorInfo(text: string): string {
 export default function Chat() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [userMessage, setUserMessage] = useState<string>("");
+	const [isTyping, setIsTyping] = useState(false);
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
 	const containsMarkdown = (text: string) =>
@@ -64,6 +65,7 @@ export default function Chat() {
 			const updatedMessages = [...messages, newMessage];
 			addMessage(userMessage, "user");
 			setUserMessage("");
+			setIsTyping(true);
 
 			const botResponse = await fetch("/api/chatbot", {
 				method: "POST",
@@ -73,9 +75,14 @@ export default function Chat() {
 				}),
 			}).then((response) => response.json());
 
+			setIsTyping(false);
 			addMessage(formatDoctorInfo(botResponse.message), "assistant");
 		}
 	};
+
+	useEffect(() => {
+		console.log(messages);
+	}, [messages]);
 
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter") {
@@ -123,6 +130,13 @@ export default function Chat() {
 							</div>
 						</div>
 					))}
+					{isTyping && (
+						<div className="mb-2 flex justify-start">
+							<div className="rounded px-4 py-2 bg-gray-300 text-black animate-pulse">
+								...
+							</div>
+						</div>
+					)}
 				</div>
 				<div className="flex mt-4">
 					<input
