@@ -109,10 +109,14 @@ func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
 
 	// Location
 	router.POST(prefix+"/location/wkt", handler.GetWKTLocation)
+	// TODO
+	// location to address
 
 	// Specialist
 	router.POST(prefix+"/specialist/find", handler.FindSpecialist)
+	// TODO
 	// closest specialist
+	// all specialists in area
 
 	// Specialties
 	router.POST(prefix+"/specialties/all", handler.GetSpecialties)
