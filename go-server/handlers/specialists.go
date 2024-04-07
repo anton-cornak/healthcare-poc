@@ -26,7 +26,7 @@ type FindSpecialistResponse struct {
 // @Param		payload	body		FindSpecialistPayload	true	"Specialty, radius, and user location"
 // @Success		200		{object}	SuccessResponse
 // @Failure		500		{object}	ErrorResponse
-// @Router		/specialist [post]
+// @Router		/specialist/find [post]
 func (h *Handler) FindSpecialist(c *gin.Context) {
 	var payload FindSpecialistPayload
 	var errResp ErrorResponse

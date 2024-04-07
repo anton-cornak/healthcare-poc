@@ -23,7 +23,7 @@ type AddPayload struct {
 // @Param		payload	body		AddPayload	true	"Numbers to add"
 // @Success		200		{object}	SuccessResponse
 // @Failure		400		{object}	ErrorResponse
-// @Router		/add [post]
+// @Router		/math/add [post]
 func (h *Handler) Add(c *gin.Context) {
 	var payload AddPayload
 	var errResp ErrorResponse
@@ -70,7 +70,7 @@ type SubtractPayload struct {
 //	@Param			payload	body		SubtractPayload	true	"Numbers to substract from the 'number'"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
-//	@Router			/subtract [post]
+//	@Router			/math/subtract [post]
 func (h *Handler) Subtract(c *gin.Context) {
 	var payload SubtractPayload
 	var errResp ErrorResponse
@@ -117,7 +117,7 @@ type ComputePayload struct {
 //	@Param			payload	body		ComputePayload	true	"Compute payload"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
-//	@Router			/compute [post]
+//	@Router			/math/compute [post]
 func (h *Handler) Compute(c *gin.Context) {
 	var payload ComputePayload
 	var errResp ErrorResponse

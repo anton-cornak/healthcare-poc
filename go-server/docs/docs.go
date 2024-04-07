@@ -15,7 +15,83 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/add": {
+        "/location/address": {
+            "post": {
+                "description": "Get the address based on the WKT location",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get address from WKT",
+                "operationId": "address",
+                "parameters": [
+                    {
+                        "description": "WKT location",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetAddressFromWKTPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetAddressFromWKTResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/location/wkt": {
+            "post": {
+                "description": "Get the WKT location based on the user's location",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get WKT location",
+                "operationId": "location",
+                "parameters": [
+                    {
+                        "description": "User location",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetWKTLocationPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/math/add": {
             "post": {
                 "description": "Add all numbers provided in the payload",
                 "consumes": [
@@ -53,7 +129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/compute": {
+        "/math/compute": {
             "post": {
                 "description": "Adds all numbers in the 'add' list and subtracts all numbers in the 'subtract' list.",
                 "consumes": [
@@ -93,25 +169,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/location": {
+        "/math/subtract": {
             "post": {
-                "description": "Get the WKT location based on the user's location",
+                "description": "Subtract all numbers in the 'subtract' list from the 'number'.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get WKT location",
-                "operationId": "location",
+                "tags": [
+                    "Math Operations"
+                ],
+                "summary": "Subtract numbers",
                 "parameters": [
                     {
-                        "description": "User location",
+                        "description": "Numbers to substract from the 'number'",
                         "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.GetWKTLocationPayload"
+                            "$ref": "#/definitions/handlers.SubtractPayload"
                         }
                     }
                 ],
@@ -131,7 +209,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/specialist": {
+        "/specialist/find": {
             "post": {
                 "description": "Find a specialist based on the user's location, specialty, and radius",
                 "consumes": [
@@ -169,7 +247,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/specialties": {
+        "/specialty/all": {
             "post": {
                 "description": "Get all specialties",
                 "consumes": [
@@ -189,46 +267,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/subtract": {
-            "post": {
-                "description": "Subtract all numbers in the 'subtract' list from the 'number'.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Math Operations"
-                ],
-                "summary": "Subtract numbers",
-                "parameters": [
-                    {
-                        "description": "Numbers to substract from the 'number'",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.SubtractPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -284,6 +322,22 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetAddressFromWKTPayload": {
+            "type": "object",
+            "properties": {
+                "wkt_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetAddressFromWKTResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
                     "type": "string"
                 }
             }

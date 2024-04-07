@@ -18,7 +18,7 @@ type GetSpecialtiesResponse struct {
 // @Produce		json
 // @Success		200		{object}	GetSpecialtiesResponse
 // @Failure		500		{object}	ErrorResponse
-// @Router		/specialties [post]
+// @Router		/specialty/all [post]
 func (h *Handler) GetSpecialties(c *gin.Context) {
 	var errResp ErrorResponse
 

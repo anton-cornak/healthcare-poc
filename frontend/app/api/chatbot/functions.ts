@@ -1,7 +1,8 @@
-// OpenAI returns 'specialties/all' does not match '^[a-zA-Z0-9_-]{1,64}$'
+// OpenAI returns 'specialty/all' does not match '^[a-zA-Z0-9_-]{1,64}$'
 const functionMapping: { [key: string]: string } = {
 	"location-wkt": "location/wkt",
-	"specialties-all": "specialties/all",
+	"location-address": "location/address",
+	"specialty-all": "specialty/all",
 	"specialist-find": "specialist/find",
 };
 
@@ -25,7 +26,25 @@ const functionDescription = [
 		},
 	},
 	{
-		name: "specialties-all",
+		name: "location-address",
+		description:
+			"Generates a string representation of a location from a WKT representation of the location",
+		parameters: {
+			type: "object",
+			properties: {
+				wkt_location: {
+					type: "string",
+					description:
+						"A WKT representation of the user's location, e.g. 'POINT(21.2496774 48.7172272)'",
+				},
+			},
+			required: ["wkt_location"],
+			description:
+				"Payload containing user location as a WKT representation",
+		},
+	},
+	{
+		name: "specialty-all",
 		description: "Gets list of all specialties in the database",
 	},
 	{
