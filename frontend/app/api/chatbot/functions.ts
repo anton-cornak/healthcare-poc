@@ -1,5 +1,6 @@
 // OpenAI returns 'specialty/all' does not match '^[a-zA-Z0-9_-]{1,64}$'
 const functionMapping: { [key: string]: string } = {
+	"time-current": "time/current",
 	"location-wkt": "location/wkt",
 	"location-address": "location/address",
 	"specialty-all": "specialty/all",
@@ -7,6 +8,23 @@ const functionMapping: { [key: string]: string } = {
 };
 
 const functionDescription = [
+	{
+		name: "time-current",
+		description: "Gets the current time",
+		parameters: {
+			type: "object",
+			properties: {
+				timezone: {
+					type: "string",
+					description:
+						"Timezone as a string representation in format Shanghai/China",
+				},
+			},
+			required: ["timezone"],
+			description:
+				"Payload containing timezone as a string representation in format Shanghai/China",
+		},
+	},
 	{
 		name: "location-wkt",
 		description:

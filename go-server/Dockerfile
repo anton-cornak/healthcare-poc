@@ -18,6 +18,7 @@ COPY .envrc ./.envrc
 COPY cmd/ ./cmd
 COPY docs/ ./docs
 COPY handlers/ ./handlers
+COPY scrapers/ ./scrapers
 COPY models/ ./models
 COPY types/ ./types
 

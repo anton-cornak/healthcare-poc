@@ -8,6 +8,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/acornak/healthcare-poc/handlers"
+	"github.com/acornak/healthcare-poc/scrapers"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
@@ -52,7 +53,7 @@ func TestMainRoutes(t *testing.T) {
 	defer db.Close()
 
 	// Create the server
-	s := newServer(logger, &handlers.Handler{Logger: logger})
+	s := newServer(logger, &handlers.Handler{Logger: logger}, &scrapers.Scraper{})
 
 	// Assert that the returned server instance is not nil
 	if s == nil || s.Router == nil {

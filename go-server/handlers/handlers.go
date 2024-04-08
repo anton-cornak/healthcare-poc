@@ -13,6 +13,13 @@ type Handler struct {
 	Get    func(url string) (resp *http.Response, err error)
 }
 
+func NewHandler(logger *zap.Logger, models models.Models, Get func(url string) (resp *http.Response, err error)) *Handler {
+	return &Handler{
+		Logger: logger,
+		Models: models,
+	}
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }

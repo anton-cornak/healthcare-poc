@@ -58,10 +58,24 @@ export default function Chat() {
 
 	const handleUserMessage = async () => {
 		if (userMessage.trim() !== "") {
+			const date = new Date();
+			const dateAsString: string = date.toString();
+			let timezone: string;
+			try {
+				const match = dateAsString.match(/\(([^\)]+)\)$/);
+				timezone = match ? match[1] : "Central European Summer Time";
+			} catch (error) {
+				timezone = "Central European Summer Time";
+			}
+
 			const newMessage: Message = {
-				content: userMessage,
+				content:
+					userMessage +
+					" NOT USER MESSAGE: user timezone: " +
+					timezone,
 				role: "user",
 			};
+
 			const updatedMessages = [...messages, newMessage];
 			addMessage(userMessage, "user");
 			setUserMessage("");
@@ -70,7 +84,6 @@ export default function Chat() {
 			const botResponse = await fetch("/api/chatbot", {
 				method: "POST",
 				body: JSON.stringify({
-					message: userMessage,
 					conversation: updatedMessages,
 				}),
 			}).then((response) => response.json());

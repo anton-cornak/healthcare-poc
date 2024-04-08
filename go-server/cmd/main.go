@@ -11,6 +11,7 @@ import (
 
 	"github.com/acornak/healthcare-poc/handlers"
 	"github.com/acornak/healthcare-poc/models"
+	"github.com/acornak/healthcare-poc/scrapers"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -31,6 +32,7 @@ type server struct {
 	Router  *gin.Engine
 	Logger  logger
 	Handler *handlers.Handler
+	Scraper *scrapers.Scraper
 }
 
 type config struct {
@@ -93,9 +95,9 @@ func initializeDatabase(cfg *dbConfig, logger *zap.Logger) (*sql.DB, error) {
 	return nil, errors.New("failed to connect to the database")
 }
 
-func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
+func newServer(logger *zap.Logger, handler *handlers.Handler, scraper *scrapers.Scraper) *server {
 	router := gin.Default()
-	s := &server{Router: router, Logger: logger, Handler: handler}
+	s := &server{Router: router, Logger: logger, Handler: handler, Scraper: scraper}
 
 	prefix := "/api/" + apiVersion
 
@@ -106,6 +108,9 @@ func newServer(logger *zap.Logger, handler *handlers.Handler) *server {
 	router.POST(prefix+"/math/add", handler.Add)
 	router.POST(prefix+"/math/subtract", handler.Subtract)
 	router.POST(prefix+"/math/compute", handler.Compute)
+
+	// Time
+	router.POST(prefix+"/time/current", handler.GetCurrentTime)
 
 	// Location
 	router.POST(prefix+"/location/wkt", handler.GetWKTLocation)
@@ -166,17 +171,32 @@ func main() {
 	}
 	gin.SetMode(ginMode)
 
-	s := newServer(logger, &handlers.Handler{
-		Logger: logger,
-		Models: models.NewModels(db),
-		Get:    http.Get,
-	})
+	s := newServer(
+		logger,
+		handlers.NewHandler(logger, models.NewModels(db), http.Get),
+		scrapers.NewScraper(logger, http.Get),
+	)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 		logger.Info("PORT not found in env, using 8080 as default")
 	}
+
+	// initial scrape
+	if err = s.Scraper.GetSpecialists(); err != nil {
+		logger.Error("", zap.Error(err))
+	}
+
+	// scrape specialists every 2 minutes
+	ticker := time.NewTicker(2 * time.Minute)
+	go func() {
+		for range ticker.C {
+			if err := s.Scraper.GetSpecialists(); err != nil {
+				logger.Error("", zap.Error(err))
+			}
+		}
+	}()
 
 	if err := s.Router.Run(":" + port); err != nil {
 		logger.Fatal("Failed to start server", zap.Error(err))
