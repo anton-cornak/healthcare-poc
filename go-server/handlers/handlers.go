@@ -17,6 +17,7 @@ func NewHandler(logger *zap.Logger, models models.Models, Get func(url string) (
 	return &Handler{
 		Logger: logger,
 		Models: models,
+		Get:    Get,
 	}
 }
 
