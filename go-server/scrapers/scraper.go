@@ -2,22 +2,23 @@ package scrapers
 
 import (
 	"crypto/tls"
-	"io"
 	"net/http"
 	"time"
 
+	"github.com/acornak/healthcare-poc/models"
 	"go.uber.org/zap"
 )
 
 type Scraper struct {
 	Logger *zap.Logger
+	Models models.Models
 	Get    func(url string) (resp *http.Response, err error)
-	Post   func(url string, contentType string, body io.Reader) (resp *http.Response, err error)
 }
 
-func NewScraper(logger *zap.Logger, Get func(url string) (resp *http.Response, err error)) *Scraper {
+func NewScraper(logger *zap.Logger, models models.Models) *Scraper {
 	return &Scraper{
 		Logger: logger,
+		Models: models,
 		Get: func(url string) (*http.Response, error) {
 			customTransport := &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

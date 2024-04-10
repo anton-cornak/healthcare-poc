@@ -52,6 +52,9 @@ func (m *DBModel) GetSpecialtyByID(id int) (*types.Specialty, error) {
 	var s types.Specialty
 	err := row.Scan(&s.ID, &s.Name, &s.Description)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -61,6 +64,33 @@ func (m *DBModel) GetSpecialtyByID(id int) (*types.Specialty, error) {
 /*
 GetSpecialtyByName returns a specialty from the database with a specific name
 The name is the name of the specialty
+The function returns a pointer to a Specialty struct
+The function returns an error if there was an issue with the database
+*/
+func (m *DBModel) GetSpecialtyByName(name string) (*types.Specialty, error) {
+	stmt := `
+	SELECT id, name, description
+	FROM specialty
+	WHERE name=$1
+	`
+
+	row := m.DB.QueryRow(stmt, name)
+
+	var s types.Specialty
+	err := row.Scan(&s.ID, &s.Name, &s.Description)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+/*
+InsertSpecialty inserts a specialty into the database
+The s parameter is a Specialty struct
 The function returns an error if there was an issue with the database
 */
 func (m *DBModel) InsertSpecialty(s types.Specialty) error {
@@ -72,6 +102,27 @@ func (m *DBModel) InsertSpecialty(s types.Specialty) error {
 	_, err := m.DB.Exec(stmt, s.Name, s.Description)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+/*
+InsertMultipleSpecialties inserts multiple specialties into the database
+The s parameter is a slice of Specialty structs
+The function returns an error if there was an issue with the database
+*/
+func (m *DBModel) InsertMultipleSpecialties(s []types.Specialty) error {
+	stmt := `
+	INSERT INTO specialty (name, description)
+	VALUES ($1, $2)
+	`
+
+	for _, specialty := range s {
+		_, err := m.DB.Exec(stmt, specialty.Name, specialty.Description)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

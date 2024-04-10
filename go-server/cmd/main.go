@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -173,8 +172,8 @@ func main() {
 
 	s := newServer(
 		logger,
-		handlers.NewHandler(logger, models.NewModels(db), http.Get),
-		scrapers.NewScraper(logger, http.Get),
+		handlers.NewHandler(logger, models.NewModels(db)),
+		scrapers.NewScraper(logger, models.NewModels(db)),
 	)
 
 	port := os.Getenv("PORT")
@@ -184,7 +183,7 @@ func main() {
 	}
 
 	// initial scrape
-	if err = s.Scraper.GetSpecialists(); err != nil {
+	if err = s.Scraper.ScrapeHandler(); err != nil {
 		logger.Error("", zap.Error(err))
 	}
 
@@ -192,7 +191,7 @@ func main() {
 	ticker := time.NewTicker(2 * time.Minute)
 	go func() {
 		for range ticker.C {
-			if err := s.Scraper.GetSpecialists(); err != nil {
+			if err := s.Scraper.ScrapeHandler(); err != nil {
 				logger.Error("", zap.Error(err))
 			}
 		}

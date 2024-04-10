@@ -13,11 +13,11 @@ type Handler struct {
 	Get    func(url string) (resp *http.Response, err error)
 }
 
-func NewHandler(logger *zap.Logger, models models.Models, Get func(url string) (resp *http.Response, err error)) *Handler {
+func NewHandler(logger *zap.Logger, models models.Models) *Handler {
 	return &Handler{
 		Logger: logger,
 		Models: models,
-		Get:    Get,
+		Get:    http.Get,
 	}
 }
 

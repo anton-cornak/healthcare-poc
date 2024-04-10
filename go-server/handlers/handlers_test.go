@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/acornak/healthcare-poc/models"
@@ -11,7 +10,7 @@ import (
 
 func TestNewHandler(t *testing.T) {
 	logger := zap.NewExample()
-	handler := NewHandler(logger, models.Models{}, http.Get)
+	handler := NewHandler(logger, models.Models{})
 
 	assert.NotNil(t, handler)
 }
