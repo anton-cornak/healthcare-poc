@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAllSpecialists_SqlError(t *testing.T) {
+func TestGetAllSpecialists_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -19,7 +19,7 @@ func TestAllSpecialists_SqlError(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialists()
+	res, err := modelsDB.DB.GetAllSpecialists()
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
@@ -27,7 +27,7 @@ func TestAllSpecialists_SqlError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestAllSpecialists_RowsScanError(t *testing.T) {
+func TestGetAllSpecialists_RowsScanError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -41,7 +41,7 @@ func TestAllSpecialists_RowsScanError(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(rows)
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialists()
+	res, err := modelsDB.DB.GetAllSpecialists()
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "rows scan error")
@@ -49,7 +49,7 @@ func TestAllSpecialists_RowsScanError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestAllSpecialists_Success(t *testing.T) {
+func TestGetAllSpecialists_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -62,7 +62,7 @@ func TestAllSpecialists_Success(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(rows)
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialists()
+	res, err := modelsDB.DB.GetAllSpecialists()
 
 	expected := []*types.Specialist{
 		{
@@ -186,6 +186,25 @@ func TestGetSpecialistByID_SqlError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+func TestGetSpecialistByID_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+
+	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE id=`).WithArgs(1).WillReturnRows(rows)
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistByID(1)
+
+	assert.NoError(t, err)
+	assert.Nil(t, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 func TestGetSpecialistByID_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -200,6 +219,75 @@ func TestGetSpecialistByID_Success(t *testing.T) {
 
 	modelsDB := NewModels(db)
 	res, err := modelsDB.DB.GetSpecialistByID(1)
+
+	expected := &types.Specialist{
+		ID:   1,
+		Name: "John Doe",
+
+		SpecialtyID: 1,
+		Location:    "New York",
+		Address:     "123 Main St",
+		Url:         "https://example.com",
+		Telephone:   "123-456-7890",
+		Email:       "me@example.com",
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetSpecialistByName_SqlError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("test").WillReturnError(errors.New("mocked error"))
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistByName("test")
+
+	assert.Error(t, err)
+	assert.EqualError(t, err, "mocked error")
+	assert.Nil(t, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetSpecialistByName_NoRows(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+
+	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("test").WillReturnRows(rows)
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistByName("test")
+
+	assert.NoError(t, err)
+	assert.Nil(t, res)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetSpecialistByName_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to open sqlmock database: %s", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+
+	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("test").WillReturnRows(rows)
+
+	modelsDB := NewModels(db)
+	res, err := modelsDB.DB.GetSpecialistByName("test")
 
 	expected := &types.Specialist{
 		ID:   1,

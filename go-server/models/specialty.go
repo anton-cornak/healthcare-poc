@@ -3,11 +3,11 @@ package models
 import "github.com/acornak/healthcare-poc/types"
 
 /*
-AllSpecialties returns all specialties from the database
+GetAllSpecialties returns all specialties from the database
 The function returns a slice of pointers to Specialty structs
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) AllSpecialties() ([]*types.Specialty, error) {
+func (m *DBModel) GetAllSpecialties() ([]*types.Specialty, error) {
 	stmt := `
 	SELECT id, name, description
 	FROM specialty

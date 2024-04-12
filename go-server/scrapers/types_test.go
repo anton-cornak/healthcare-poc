@@ -3,6 +3,7 @@ package scrapers
 import (
 	"testing"
 
+	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,7 +49,7 @@ func setupTestCase() geoportalSpecialist {
 func TestGetWKTLocation(t *testing.T) {
 	testCase := setupTestCase()
 
-	expected := "POINT(48.789456 21.123456)"
+	expected := "POINT(21.123456 48.789456)"
 	actual := testCase.getWKTLocation()
 	assert.Equal(t, expected, actual)
 }
@@ -120,5 +121,20 @@ func TestGetDovera(t *testing.T) {
 	testCase.Dovera = "áno"
 	expected = true
 	actual = testCase.getDovera()
+	assert.Equal(t, expected, actual)
+}
+
+func TestCastToDbType(t *testing.T) {
+	testCase := setupTestCase()
+
+	expected := types.Specialist{
+		Name:        "Ambulancia vnútorného lekárstva, MUDr. Milena Zidanova, Michalovce, (Milzid s.r.o.)",
+		SpecialtyID: 1,
+		Location:    "POINT(21.123456 48.789456)",
+		Address:     "Ulica 9, 07101 Michalovce, Slovenská republika",
+		Telephone:   "+421 123 456 789, +421 987 654 321",
+		Email:       "me@example.com",
+	}
+	actual := testCase.castToDbType(1)
 	assert.Equal(t, expected, actual)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAllSpecialties_SqlError(t *testing.T) {
+func TestGetAllSpecialties_SqlError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -19,7 +19,7 @@ func TestAllSpecialties_SqlError(t *testing.T) {
 	mock.ExpectQuery(`SELECT (.+) FROM specialty`).WithoutArgs().WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialties()
+	res, err := modelsDB.DB.GetAllSpecialties()
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "mocked error")
@@ -27,7 +27,7 @@ func TestAllSpecialties_SqlError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestAllSpecialties_RowsScanError(t *testing.T) {
+func TestGetAllSpecialties_RowsScanError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -40,7 +40,7 @@ func TestAllSpecialties_RowsScanError(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM specialty").WithoutArgs().WillReturnRows(rows)
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialties()
+	res, err := modelsDB.DB.GetAllSpecialties()
 
 	assert.Error(t, err)
 	assert.EqualError(t, err, "rows scan error")
@@ -48,7 +48,7 @@ func TestAllSpecialties_RowsScanError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestAllSpecialties_Success(t *testing.T) {
+func TestGetAllSpecialties_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
@@ -60,7 +60,7 @@ func TestAllSpecialties_Success(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM specialty").WithoutArgs().WillReturnRows(rows)
 
 	modelsDB := NewModels(db)
-	res, err := modelsDB.DB.AllSpecialties()
+	res, err := modelsDB.DB.GetAllSpecialties()
 
 	expected := []*types.Specialty{
 		{

@@ -3,11 +3,11 @@ package models
 import "github.com/acornak/healthcare-poc/types"
 
 /*
-AllSpecialists returns all specialists from the database
+GetAllSpecialists returns all specialists from the database
 The function returns a slice of pointers to Specialist structs
 The function returns an error if there was an issue with the database
 */
-func (m *DBModel) AllSpecialists() ([]*types.Specialist, error) {
+func (m *DBModel) GetAllSpecialists() ([]*types.Specialist, error) {
 	stmt := `
 	SELECT id, name, specialty_id, location, address, url, telephone, email
 	FROM specialist
@@ -86,6 +86,36 @@ func (m *DBModel) GetSpecialistByID(id int) (*types.Specialist, error) {
 	var s types.Specialist
 	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+/*
+GetSpecialistByName returns a specialist from the database with a specific name
+The name is the name of the specialist
+The function returns a pointer to a Specialist struct
+The function returns an error if there was an issue with the database
+*/
+func (m *DBModel) GetSpecialistByName(name string) (*types.Specialist, error) {
+	stmt := `
+	SELECT id, name, specialty_id, location, address, url, telephone, email
+	FROM specialist
+	WHERE name=$1
+	`
+
+	row := m.DB.QueryRow(stmt, name)
+
+	var s types.Specialist
+	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
 		return nil, err
 	}
 

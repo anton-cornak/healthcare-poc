@@ -38,7 +38,12 @@ definitions:
     type: object
   handlers.GetAddressFromWKTResponse:
     properties:
-      address:
+      display_name:
+        type: string
+    type: object
+  handlers.GetCurrentTimeResponse:
+    properties:
+      time:
         type: string
     type: object
   handlers.GetSpecialtiesResponse:
@@ -251,4 +256,22 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       summary: Get specialties
+  /time/current:
+    post:
+      consumes:
+      - application/json
+      description: Get the current time in a specific timezone
+      operationId: current-time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetCurrentTimeResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get current time
 swagger: "2.0"

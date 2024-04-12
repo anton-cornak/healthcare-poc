@@ -22,7 +22,7 @@ type GetSpecialtiesResponse struct {
 func (h *Handler) GetSpecialties(c *gin.Context) {
 	var errResp ErrorResponse
 
-	specialties, err := h.Models.DB.AllSpecialties()
+	specialties, err := h.Models.DB.GetAllSpecialties()
 	if err != nil {
 		errResp.Error = err.Error()
 		c.JSON(http.StatusInternalServerError, errResp)

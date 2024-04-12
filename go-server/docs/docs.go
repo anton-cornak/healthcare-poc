@@ -273,6 +273,33 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/time/current": {
+            "post": {
+                "description": "Get the current time in a specific timezone",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get current time",
+                "operationId": "current-time",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetCurrentTimeResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -337,7 +364,15 @@ const docTemplate = `{
         "handlers.GetAddressFromWKTResponse": {
             "type": "object",
             "properties": {
-                "address": {
+                "display_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetCurrentTimeResponse": {
+            "type": "object",
+            "properties": {
+                "time": {
                     "type": "string"
                 }
             }

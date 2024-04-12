@@ -3,6 +3,8 @@ package scrapers
 import (
 	"strconv"
 	"strings"
+
+	"github.com/acornak/healthcare-poc/types"
 )
 
 type geoportalSpecialist struct {
@@ -42,7 +44,7 @@ type geoportalSpecialist struct {
 func (g *geoportalSpecialist) getWKTLocation() string {
 	lat := strconv.FormatFloat(g.Latitude, 'f', -1, 64)
 	lon := strconv.FormatFloat(g.Longitude, 'f', -1, 64)
-	return "POINT(" + lat + " " + lon + ")"
+	return "POINT(" + lon + " " + lat + ")"
 }
 
 func (g *geoportalSpecialist) getAddress() string {
@@ -98,5 +100,16 @@ func (g *geoportalSpecialist) getDovera() bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+func (g *geoportalSpecialist) castToDbType(specialtyID int) types.Specialist {
+	return types.Specialist{
+		Name:        g.Name,
+		SpecialtyID: specialtyID,
+		Location:    g.getWKTLocation(),
+		Address:     g.getAddress(),
+		Telephone:   g.getSpecialistPhones(),
+		Email:       g.Email,
 	}
 }
