@@ -18,7 +18,6 @@ import (
 )
 
 func TestFindSpecialistHandler_InvalidJson(t *testing.T) {
-	// Create a new Gin router and handler
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -30,36 +29,28 @@ func TestFindSpecialistHandler_InvalidJson(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := "{invalid_json}"
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/specialist", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/specialist", handler.FindSpecialist)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid JSON payload", response.Error)
 }
 
 func TestFindSpecialistHandler_IncompletePayload(t *testing.T) {
-	// Create a new Gin router and handler
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -71,7 +62,6 @@ func TestFindSpecialistHandler_IncompletePayload(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an incomplete payload
 	payload := FindSpecialistPayload{}
 
 	payloadJSON, err := json.Marshal(payload)
@@ -84,24 +74,19 @@ func TestFindSpecialistHandler_IncompletePayload(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/specialist", handler.FindSpecialist)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid payload: missing specialty_id, radius, user_location", response.Error)
 }
 
@@ -121,7 +106,7 @@ func TestFindSpecialistHandler_SqlError(t *testing.T) {
 	modelsDB := models.NewModels(db)
 	payload := FindSpecialistPayload{SpecialtyId: 1, Radius: 10, UserLocation: "POINT(-71.060316 48.432044)"}
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,
@@ -170,7 +155,7 @@ func TestFindSpecialistHandler_EmptyResponse(t *testing.T) {
 	modelsDB := models.NewModels(db)
 	payload := FindSpecialistPayload{SpecialtyId: 1, Radius: 10, UserLocation: "POINT(-71.060316 48.432044)"}
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,
@@ -214,24 +199,31 @@ func TestFindSpecialistHandler_Success(t *testing.T) {
 
 	specialist := types.Specialist{
 		ID:          1,
-		Name:        "Dr. John Doe",
+		Name:        "John Doe",
 		SpecialtyID: 1,
-		Location:    "POINT(-71.060316 48.432044)",
-		Address:     "123 Main St, Boston, MA 02110",
+		Location:    "New York",
+		Address:     "123 Main St",
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
-		Email:       "john@doe.com",
+		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(specialist.ID, specialist.Name, specialist.SpecialtyID, specialist.Location, specialist.Address, specialist.Url, specialist.Telephone, specialist.Email)
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(specialist.ID, specialist.Name, specialist.SpecialtyID, specialist.Location, specialist.Address, specialist.Url, specialist.Telephone, specialist.Email, specialist.Monday, specialist.Tuesday, specialist.Wednesday, specialist.Thursday, specialist.Friday, specialist.Saturday, specialist.Sunday)
 
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithArgs(1, "POINT(-71.060316 48.432044)", 10).WillReturnRows(rows)
 
 	modelsDB := models.NewModels(db)
 	payload := FindSpecialistPayload{SpecialtyId: 1, Radius: 10, UserLocation: "POINT(-71.060316 48.432044)"}
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,
@@ -271,6 +263,13 @@ func TestFindSpecialistHandler_Success(t *testing.T) {
 		{specialist.Url, response.Specialists[0].Url, "Url"},
 		{specialist.Telephone, response.Specialists[0].Telephone, "Telephone"},
 		{specialist.Email, response.Specialists[0].Email, "Email"},
+		{specialist.Monday, response.Specialists[0].Monday, "Monday"},
+		{specialist.Tuesday, response.Specialists[0].Tuesday, "Tuesday"},
+		{specialist.Wednesday, response.Specialists[0].Wednesday, "Wednesday"},
+		{specialist.Thursday, response.Specialists[0].Thursday, "Thursday"},
+		{specialist.Friday, response.Specialists[0].Friday, "Friday"},
+		{specialist.Saturday, response.Specialists[0].Saturday, "Saturday"},
+		{specialist.Sunday, response.Specialists[0].Sunday, "Sunday"},
 	}
 
 	for _, field := range fields {

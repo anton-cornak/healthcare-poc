@@ -34,8 +34,8 @@ func TestGetAllSpecialists_RowsScanError(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 	rows.RowError(0, errors.New("rows scan error"))
 
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(rows)
@@ -56,8 +56,8 @@ func TestGetAllSpecialists_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithoutArgs().WillReturnRows(rows)
 
@@ -74,6 +74,13 @@ func TestGetAllSpecialists_Success(t *testing.T) {
 			Url:         "https://example.com",
 			Telephone:   "123-456-7890",
 			Email:       "me@example.com",
+			Monday:      "7:00 - 12:00, 13:00 - 15:00",
+			Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+			Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+			Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+			Friday:      "7:00 - 12:00, 13:00 - 15:00",
+			Saturday:    "",
+			Sunday:      "",
 		},
 	}
 
@@ -107,9 +114,10 @@ func TestGetSpecialistBySpecialty_RowsScanError(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com").
-		AddRow(2, "Jane Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "jane@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "").
+		AddRow(2, "Jane Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
+
 	rows.RowError(0, errors.New("rows scan error"))
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE specialty_id=`).WithArgs(1).WillReturnRows(rows)
@@ -130,9 +138,9 @@ func TestGetSpecialistBySpecialty_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com").
-		AddRow(2, "Jane Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "jane@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "").
+		AddRow(2, "Jane Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "jane@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE specialty_id=`).WithArgs(1).WillReturnRows(rows)
 
@@ -141,15 +149,21 @@ func TestGetSpecialistBySpecialty_Success(t *testing.T) {
 
 	expected := []*types.Specialist{
 		{
-			ID:   1,
-			Name: "John Doe",
-
+			ID:          1,
+			Name:        "John Doe",
 			SpecialtyID: 1,
 			Location:    "New York",
 			Address:     "123 Main St",
 			Url:         "https://example.com",
 			Telephone:   "123-456-7890",
 			Email:       "me@example.com",
+			Monday:      "7:00 - 12:00, 13:00 - 15:00",
+			Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+			Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+			Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+			Friday:      "7:00 - 12:00, 13:00 - 15:00",
+			Saturday:    "",
+			Sunday:      "",
 		},
 		{
 			ID:          2,
@@ -160,6 +174,13 @@ func TestGetSpecialistBySpecialty_Success(t *testing.T) {
 			Url:         "https://example.com",
 			Telephone:   "123-456-7890",
 			Email:       "jane@example.com",
+			Monday:      "7:00 - 12:00, 13:00 - 15:00",
+			Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+			Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+			Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+			Friday:      "7:00 - 12:00, 13:00 - 15:00",
+			Saturday:    "",
+			Sunday:      "",
 		},
 	}
 
@@ -193,7 +214,7 @@ func TestGetSpecialistByID_NoRows(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE id=`).WithArgs(1).WillReturnRows(rows)
 
@@ -212,8 +233,8 @@ func TestGetSpecialistByID_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE id=`).WithArgs(1).WillReturnRows(rows)
 
@@ -221,15 +242,21 @@ func TestGetSpecialistByID_Success(t *testing.T) {
 	res, err := modelsDB.DB.GetSpecialistByID(1)
 
 	expected := &types.Specialist{
-		ID:   1,
-		Name: "John Doe",
-
+		ID:          1,
+		Name:        "John Doe",
 		SpecialtyID: 1,
 		Location:    "New York",
 		Address:     "123 Main St",
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
 	assert.NoError(t, err)
@@ -262,7 +289,7 @@ func TestGetSpecialistByName_NoRows(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("test").WillReturnRows(rows)
 
@@ -281,8 +308,8 @@ func TestGetSpecialistByName_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("test").WillReturnRows(rows)
 
@@ -290,15 +317,21 @@ func TestGetSpecialistByName_Success(t *testing.T) {
 	res, err := modelsDB.DB.GetSpecialistByName("test")
 
 	expected := &types.Specialist{
-		ID:   1,
-		Name: "John Doe",
-
+		ID:          1,
+		Name:        "John Doe",
 		SpecialtyID: 1,
 		Location:    "New York",
 		Address:     "123 Main St",
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
 	assert.NoError(t, err)
@@ -321,9 +354,18 @@ func TestInsertSpecialist_SqlError(t *testing.T) {
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
-	mock.ExpectExec(`INSERT INTO specialist`).WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email).WillReturnError(errors.New("mocked error"))
+	mock.ExpectExec(`INSERT INTO specialist`).
+		WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday).
+		WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
 	err = modelsDB.DB.InsertSpecialist(s)
@@ -348,9 +390,18 @@ func TestInsertSpecialist_Success(t *testing.T) {
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
-	mock.ExpectExec(`INSERT INTO specialist`).WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`INSERT INTO specialist`).
+		WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	modelsDB := NewModels(db)
 	err = modelsDB.DB.InsertSpecialist(s)
@@ -408,9 +459,18 @@ func TestUpdateSpecialist_SqlError(t *testing.T) {
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
-	mock.ExpectExec(`UPDATE specialist SET name=\$1, specialty_id=\$2, location=\$3, address=\$4, url=\$5, telephone=\$6, email=\$7 WHERE id=\$8`).WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID).WillReturnError(errors.New("mocked error"))
+	mock.ExpectExec(`UPDATE specialist SET name=\$1, specialty_id=\$2, location=\$3, address=\$4, url=\$5, telephone=\$6, email=\$7, monday=\$8, tuesday=\$9, wednesday=\$10, thursday=\$11, friday=\$12, saturday=\$13, sunday=\$14 WHERE id=\$8`).
+		WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday).
+		WillReturnError(errors.New("mocked error"))
 
 	modelsDB := NewModels(db)
 	err = modelsDB.DB.UpdateSpecialist(s)
@@ -436,9 +496,18 @@ func TestUpdateSpecialist_Success(t *testing.T) {
 		Url:         "https://example.com",
 		Telephone:   "123-456-7890",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 12:00, 13:00 - 15:00",
+		Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+		Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+		Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+		Friday:      "7:00 - 12:00, 13:00 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
 
-	mock.ExpectExec(`UPDATE specialist SET name=\$1, specialty_id=\$2, location=\$3, address=\$4, url=\$5, telephone=\$6, email=\$7 WHERE id=\$8`).WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`UPDATE specialist SET name=\$1, specialty_id=\$2, location=\$3, address=\$4, url=\$5, telephone=\$6, email=\$7, monday=\$8, tuesday=\$9, wednesday=\$10, thursday=\$11, friday=\$12, saturday=\$13, sunday=\$14 WHERE id=\$8`).
+		WithArgs(s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	modelsDB := NewModels(db)
 	err = modelsDB.DB.UpdateSpecialist(s)
@@ -494,8 +563,8 @@ func TestGetSpecialistBySpecialtyAndLocation_Success(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rows := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery("SELECT (.+) FROM specialist").WithArgs(1, "123 Main St", 10000).WillReturnRows(rows)
 
@@ -512,6 +581,13 @@ func TestGetSpecialistBySpecialtyAndLocation_Success(t *testing.T) {
 			Url:         "https://example.com",
 			Telephone:   "123-456-7890",
 			Email:       "me@example.com",
+			Monday:      "7:00 - 12:00, 13:00 - 15:00",
+			Tuesday:     "7:00 - 12:00, 13:00 - 15:00",
+			Wednesday:   "7:00 - 12:00, 13:00 - 15:00",
+			Thursday:    "7:00 - 12:00, 13:00 - 15:00",
+			Friday:      "7:00 - 12:00, 13:00 - 15:00",
+			Saturday:    "",
+			Sunday:      "",
 		},
 	}
 

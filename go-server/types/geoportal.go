@@ -1,13 +1,11 @@
-package scrapers
+package types
 
 import (
 	"strconv"
 	"strings"
-
-	"github.com/acornak/healthcare-poc/types"
 )
 
-type geoportalSpecialist struct {
+type GeoportalSpecialist struct {
 	ID             int       `json:"id"`
 	Identifier     string    `json:"identifikator"`
 	KPZS           string    `json:"kpzs"`
@@ -41,20 +39,20 @@ type geoportalSpecialist struct {
 	Bbox           []float64 `json:"bbox"`
 }
 
-func (g *geoportalSpecialist) getWKTLocation() string {
+func (g *GeoportalSpecialist) getWKTLocation() string {
 	lat := strconv.FormatFloat(g.Latitude, 'f', -1, 64)
 	lon := strconv.FormatFloat(g.Longitude, 'f', -1, 64)
 	return "POINT(" + lon + " " + lat + ")"
 }
 
-func (g *geoportalSpecialist) getAddress() string {
+func (g *GeoportalSpecialist) getAddress() string {
 	if g.Address == "" {
 		return g.StreetName + " " + g.BuildingNumber + ", " + g.PostalCode + " " + g.Municipality + ", Slovenská republika"
 	}
 	return g.Address
 }
 
-func (g *geoportalSpecialist) getSpecialistNames() string {
+func (g *GeoportalSpecialist) getSpecialistNames() string {
 	toBeRemoved := []string{
 		" ako lekár",
 		" ako sestra",
@@ -75,11 +73,11 @@ func (g *geoportalSpecialist) getSpecialistNames() string {
 	return g.Staff
 }
 
-func (g *geoportalSpecialist) getSpecialistPhones() string {
+func (g *GeoportalSpecialist) getSpecialistPhones() string {
 	return g.Phone + ", " + g.Cellphone
 }
 
-func (g *geoportalSpecialist) getUnion() bool {
+func (g *GeoportalSpecialist) getUnion() bool {
 	if g.Union == "áno" {
 		return true
 	} else {
@@ -87,7 +85,7 @@ func (g *geoportalSpecialist) getUnion() bool {
 	}
 }
 
-func (g *geoportalSpecialist) getVszp() bool {
+func (g *GeoportalSpecialist) getVszp() bool {
 	if g.Vszp == "áno" {
 		return true
 	} else {
@@ -95,7 +93,7 @@ func (g *geoportalSpecialist) getVszp() bool {
 	}
 }
 
-func (g *geoportalSpecialist) getDovera() bool {
+func (g *GeoportalSpecialist) getDovera() bool {
 	if g.Dovera == "áno" {
 		return true
 	} else {
@@ -103,13 +101,20 @@ func (g *geoportalSpecialist) getDovera() bool {
 	}
 }
 
-func (g *geoportalSpecialist) castToDbType(specialtyID int) types.Specialist {
-	return types.Specialist{
+func (g *GeoportalSpecialist) CastToDbType(specialtyID int) Specialist {
+	return Specialist{
 		Name:        g.Name,
 		SpecialtyID: specialtyID,
 		Location:    g.getWKTLocation(),
 		Address:     g.getAddress(),
 		Telephone:   g.getSpecialistPhones(),
 		Email:       g.Email,
+		Monday:      g.MondayHours,
+		Tuesday:     g.TuesdayHours,
+		Wednesday:   g.WednesdayHours,
+		Thursday:    g.ThursdayHours,
+		Friday:      g.FridayHours,
+		Saturday:    g.SaturdayHours,
+		Sunday:      g.SundayHours,
 	}
 }

@@ -1,14 +1,13 @@
-package scrapers
+package types
 
 import (
 	"testing"
 
-	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupTestCase() geoportalSpecialist {
-	testCase := geoportalSpecialist{
+func setupTestCase() GeoportalSpecialist {
+	testCase := GeoportalSpecialist{
 		ID:             1,
 		Identifier:     "68-44869223-A0002",
 		KPZS:           "P27489001201",
@@ -127,14 +126,21 @@ func TestGetDovera(t *testing.T) {
 func TestCastToDbType(t *testing.T) {
 	testCase := setupTestCase()
 
-	expected := types.Specialist{
+	expected := Specialist{
 		Name:        "Ambulancia vnútorného lekárstva, MUDr. Milena Zidanova, Michalovce, (Milzid s.r.o.)",
 		SpecialtyID: 1,
 		Location:    "POINT(21.123456 48.789456)",
 		Address:     "Ulica 9, 07101 Michalovce, Slovenská republika",
 		Telephone:   "+421 123 456 789, +421 987 654 321",
 		Email:       "me@example.com",
+		Monday:      "7:00 - 13:00, 13:30 - 15:00",
+		Tuesday:     "7:00 - 13:00, 13:30 - 15:00",
+		Wednesday:   "7:00 - 13:00, 13:30 - 15:00",
+		Thursday:    "7:00 - 13:00, 13:30 - 15:00",
+		Friday:      "7:00 - 13:00, 13:30 - 15:00",
+		Saturday:    "",
+		Sunday:      "",
 	}
-	actual := testCase.castToDbType(1)
+	actual := testCase.CastToDbType(1)
 	assert.Equal(t, expected, actual)
 }

@@ -28,6 +28,13 @@ The struct contains the following fields:
 - Url: the url of the specialist
 - Telephone: the telephone of the specialist
 - Email: the email of the specialist
+- Monday: the opening hours of the specialist on Monday
+- Tuesday: the opening hours of the specialist on Tuesday
+- Wednesday: the opening hours of the specialist on Wednesday
+- Thursday: the opening hours of the specialist on Thursday
+- Friday: the opening hours of the specialist on Friday
+- Saturday: the opening hours of the specialist on Saturday
+- Sunday: the opening hours of the specialist on Sunday
 */
 type Specialist struct {
 	ID          int    `json:"id"`
@@ -38,6 +45,13 @@ type Specialist struct {
 	Url         string `json:"url,omitempty"`
 	Telephone   string `json:"telephone,omitempty"`
 	Email       string `json:"email,omitempty"`
+	Monday      string `json:"monday,omitempty"`
+	Tuesday     string `json:"tuesday,omitempty"`
+	Wednesday   string `json:"wednesday,omitempty"`
+	Thursday    string `json:"thursday,omitempty"`
+	Friday      string `json:"friday,omitempty"`
+	Saturday    string `json:"saturday,omitempty"`
+	Sunday      string `json:"sunday,omitempty"`
 }
 
 /*

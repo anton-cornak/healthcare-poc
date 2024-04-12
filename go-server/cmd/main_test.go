@@ -15,7 +15,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	// Set up test environment variables
 	os.Setenv("PORT", "8080")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_PORT", "5432")
@@ -24,10 +23,8 @@ func TestMain(m *testing.M) {
 	os.Setenv("DB_NAME", "database")
 	os.Setenv("SSL_MODE", "disable")
 
-	// Run the tests
 	code := m.Run()
 
-	// Clean up environment variables after the tests
 	os.Unsetenv("PORT")
 	os.Unsetenv("DB_HOST")
 	os.Unsetenv("DB_PORT")
@@ -36,7 +33,6 @@ func TestMain(m *testing.M) {
 	os.Unsetenv("DB_NAME")
 	os.Unsetenv("SSL_MODE")
 
-	// Exit with the appropriate exit code
 	os.Exit(code)
 }
 
@@ -45,17 +41,14 @@ func TestMainRoutes(t *testing.T) {
 
 	logger := zap.NewExample()
 
-	// Create a sample database instance
 	db, _, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
 	}
 	defer db.Close()
 
-	// Create the server
 	s := newServer(logger, &handlers.Handler{Logger: logger}, &scrapers.Scraper{})
 
-	// Assert that the returned server instance is not nil
 	if s == nil || s.Router == nil {
 		t.Error("server or router instance is nil")
 	}
@@ -86,22 +79,18 @@ func TestMainRoutes(t *testing.T) {
 }
 
 func TestLoadConfigFromEnv(t *testing.T) {
-	// Create a config instance to hold the loaded values
 	cfg := config{}
 
-	// Call the function to load config from environment variables
 	err := loadConfigFromEnv(&cfg)
 	if err != nil {
 		t.Errorf("Unexpected error loading config: %v", err)
 	}
 
-	// Validate the loaded config
 	err = validateConfig(&cfg)
 	if err != nil {
 		t.Errorf("Loaded config is invalid: %v", err)
 	}
 
-	// Perform assertions on the loaded config
 	if cfg.port != "8080" {
 		t.Errorf("Expected port to be '8080', got '%s'", cfg.port)
 	}

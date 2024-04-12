@@ -10,6 +10,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/acornak/healthcare-poc/models"
+	"github.com/acornak/healthcare-poc/types"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
@@ -34,8 +35,8 @@ func TestInsertSpecialties_GetSpecialtyError(t *testing.T) {
 	}
 
 	err = scraper.insertSpecialties([]struct {
-		Properties geoportalSpecialist
-	}{{Properties: geoportalSpecialist{Specialization: "ortoped"}}})
+		Properties types.GeoportalSpecialist
+	}{{Properties: types.GeoportalSpecialist{Specialization: "ortoped"}}})
 
 	assert.Equal(t, "mocked error", err.Error())
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -63,8 +64,8 @@ func TestInsertSpecialties_SpecialtyFound(t *testing.T) {
 	}
 
 	err = scraper.insertSpecialties([]struct {
-		Properties geoportalSpecialist
-	}{{Properties: geoportalSpecialist{Specialization: "ortoped"}}})
+		Properties types.GeoportalSpecialist
+	}{{Properties: types.GeoportalSpecialist{Specialization: "ortoped"}}})
 
 	assert.Nil(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -93,8 +94,8 @@ func TestInsertSpecialties_InsertError(t *testing.T) {
 	}
 
 	err = scraper.insertSpecialties([]struct {
-		Properties geoportalSpecialist
-	}{{Properties: geoportalSpecialist{Specialization: "ortoped"}}})
+		Properties types.GeoportalSpecialist
+	}{{Properties: types.GeoportalSpecialist{Specialization: "ortoped"}}})
 
 	assert.Equal(t, "mocked error", err.Error())
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -123,8 +124,8 @@ func TestInsertSpecialties_Success(t *testing.T) {
 	}
 
 	err = scraper.insertSpecialties([]struct {
-		Properties geoportalSpecialist
-	}{{Properties: geoportalSpecialist{Specialization: "ortoped"}}})
+		Properties types.GeoportalSpecialist
+	}{{Properties: types.GeoportalSpecialist{Specialization: "ortoped"}}})
 
 	assert.Nil(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -236,8 +237,8 @@ func TestScraperHandler_SpecialistFound(t *testing.T) {
 	defer db.Close()
 
 	rowsSpecialty := sqlmock.NewRows([]string{"id", "name", "description"})
-	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"}).
-		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com")
+	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}).
+		AddRow(1, "John Doe", 1, "New York", "123 Main St", "https://example.com", "123-456-7890", "me@example.com", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "7:00 - 12:00, 13:00 - 15:00", "", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialty)
 	mock.ExpectExec("INSERT INTO specialty").WithArgs("ortoped", "").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -277,7 +278,7 @@ func TestScraperHandler_GetSpecialtyByNameError(t *testing.T) {
 	defer db.Close()
 
 	rowsSpecialty := sqlmock.NewRows([]string{"id", "name", "description"})
-	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialty)
 	mock.ExpectExec("INSERT INTO specialty").WithArgs("ortoped", "").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -318,7 +319,7 @@ func TestScraperHandler_SpecialtyNotFound(t *testing.T) {
 	defer db.Close()
 
 	rowsSpecialty := sqlmock.NewRows([]string{"id", "name", "description"})
-	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialty)
 	mock.ExpectExec("INSERT INTO specialty").WithArgs("ortoped", "").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -359,14 +360,17 @@ func TestScraperHandler_InsertSpecialistError(t *testing.T) {
 	defer db.Close()
 
 	rowsSpecialty := sqlmock.NewRows([]string{"id", "name", "description"})
-	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 	rowsSpecialtyByName := sqlmock.NewRows([]string{"id", "name", "description"}).AddRow(1, "ortoped", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialty)
 	mock.ExpectExec("INSERT INTO specialty").WithArgs("ortoped", "").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("John Doe, Md.").WillReturnRows(rowsSpecialist)
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialtyByName)
-	mock.ExpectExec(`INSERT INTO specialist`).WithArgs("John Doe, Md.", 1, "POINT(0 0)", " ,  , Slovenská republika", "", ", ", "").WillReturnError(errors.New("mocked error"))
+
+	mock.ExpectExec(`INSERT INTO specialist`).
+		WithArgs("John Doe, Md.", 1, "POINT(0 0)", " ,  , Slovenská republika", "", ", ", "", "", "", "", "", "", "", "").
+		WillReturnError(errors.New("mocked error"))
 
 	resp := `{"features":[{"properties":{"id":1, "nazov_zariadenia": "John Doe, Md.", "druh_zariadenia": "ortoped"}}]}`
 
@@ -402,14 +406,16 @@ func TestScraperHandler_Success(t *testing.T) {
 	defer db.Close()
 
 	rowsSpecialty := sqlmock.NewRows([]string{"id", "name", "description"})
-	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email"})
+	rowsSpecialist := sqlmock.NewRows([]string{"id", "name", "specialty_id", "location", "address", "url", "telephone", "email", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"})
 	rowsSpecialtyByName := sqlmock.NewRows([]string{"id", "name", "description"}).AddRow(1, "ortoped", "")
 
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialty)
 	mock.ExpectExec("INSERT INTO specialty").WithArgs("ortoped", "").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectQuery(`SELECT (.+) FROM specialist WHERE name=`).WithArgs("John Doe, Md.").WillReturnRows(rowsSpecialist)
 	mock.ExpectQuery(`SELECT (.+) FROM specialty WHERE name=\$1`).WithArgs("ortoped").WillReturnRows(rowsSpecialtyByName)
-	mock.ExpectExec(`INSERT INTO specialist`).WithArgs("John Doe, Md.", 1, "POINT(0 0)", " ,  , Slovenská republika", "", ", ", "").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`INSERT INTO specialist`).
+		WithArgs("John Doe, Md.", 1, "POINT(0 0)", " ,  , Slovenská republika", "", ", ", "", "", "", "", "", "", "", "").
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	resp := `{"features":[{"properties":{"id":1, "nazov_zariadenia": "John Doe, Md.", "druh_zariadenia": "ortoped"}}]}`
 

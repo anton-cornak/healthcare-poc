@@ -9,7 +9,7 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) GetAllSpecialists() ([]*types.Specialist, error) {
 	stmt := `
-	SELECT id, name, specialty_id, location, address, url, telephone, email
+	SELECT id, name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday
 	FROM specialist
 	`
 
@@ -23,7 +23,7 @@ func (m *DBModel) GetAllSpecialists() ([]*types.Specialist, error) {
 
 	for rows.Next() {
 		var s types.Specialist
-		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email, &s.Monday, &s.Tuesday, &s.Wednesday, &s.Thursday, &s.Friday, &s.Saturday, &s.Sunday)
 		specialists = append(specialists, &s)
 	}
 
@@ -42,7 +42,7 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*types.Specialist, error) {
 	stmt := `
-	SELECT id, name, specialty_id, location, address, url, telephone, email
+	SELECT id, name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday
 	FROM specialist
 	WHERE specialty_id=$1
 	`
@@ -57,7 +57,7 @@ func (m *DBModel) GetSpecialistBySpecialty(specialtyID int) ([]*types.Specialist
 
 	for rows.Next() {
 		var s types.Specialist
-		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email, &s.Monday, &s.Tuesday, &s.Wednesday, &s.Thursday, &s.Friday, &s.Saturday, &s.Sunday)
 		specialists = append(specialists, &s)
 	}
 
@@ -76,7 +76,7 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) GetSpecialistByID(id int) (*types.Specialist, error) {
 	stmt := `
-	SELECT id, name, specialty_id, location, address, url, telephone, email
+	SELECT id, name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday
 	FROM specialist
 	WHERE id=$1
 	`
@@ -84,7 +84,7 @@ func (m *DBModel) GetSpecialistByID(id int) (*types.Specialist, error) {
 	row := m.DB.QueryRow(stmt, id)
 
 	var s types.Specialist
-	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email, &s.Monday, &s.Tuesday, &s.Wednesday, &s.Thursday, &s.Friday, &s.Saturday, &s.Sunday)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			return nil, nil
@@ -103,7 +103,7 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) GetSpecialistByName(name string) (*types.Specialist, error) {
 	stmt := `
-	SELECT id, name, specialty_id, location, address, url, telephone, email
+	SELECT id, name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday
 	FROM specialist
 	WHERE name=$1
 	`
@@ -111,7 +111,7 @@ func (m *DBModel) GetSpecialistByName(name string) (*types.Specialist, error) {
 	row := m.DB.QueryRow(stmt, name)
 
 	var s types.Specialist
-	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+	err := row.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email, &s.Monday, &s.Tuesday, &s.Wednesday, &s.Thursday, &s.Friday, &s.Saturday, &s.Sunday)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			return nil, nil
@@ -132,7 +132,7 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, userLocation string) ([]*types.Specialist, error) {
 	stmt := `
-    SELECT id, name, specialty_id, location, address, url, telephone, email 
+	SELECT id, name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday
     FROM specialist 
     WHERE specialty_id=$1 AND ST_DWithin(location, ST_GeogFromText($2), $3)
     `
@@ -147,7 +147,7 @@ func (m *DBModel) GetSpecialistBySpecialtyAndLocation(specialtyID, radius int, u
 
 	for rows.Next() {
 		var s types.Specialist
-		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email)
+		rows.Scan(&s.ID, &s.Name, &s.SpecialtyID, &s.Location, &s.Address, &s.Url, &s.Telephone, &s.Email, &s.Monday, &s.Tuesday, &s.Wednesday, &s.Thursday, &s.Friday, &s.Saturday, &s.Sunday)
 		specialists = append(specialists, &s)
 	}
 
@@ -165,11 +165,11 @@ The function returns an error if there was an issue with the database
 */
 func (m *DBModel) InsertSpecialist(s types.Specialist) error {
 	stmt := `
-	INSERT INTO specialist (name, specialty_id, location, address, url, telephone, email)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)
+	INSERT INTO specialist (name, specialty_id, location, address, url, telephone, email, monday, tuesday, wednesday, thursday, friday, saturday, sunday)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 	`
 
-	_, err := m.DB.Exec(stmt, s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email)
+	_, err := m.DB.Exec(stmt, s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday)
 	if err != nil {
 		return err
 	}
@@ -196,11 +196,11 @@ The function returns an error if there was an issue with the database
 func (m *DBModel) UpdateSpecialist(s types.Specialist) error {
 	stmt := `
 	UPDATE specialist
-	SET name=$1, specialty_id=$2, location=$3, address=$4, url=$5, telephone=$6, email=$7
+	SET name=$1, specialty_id=$2, location=$3, address=$4, url=$5, telephone=$6, email=$7, monday=$8, tuesday=$9, wednesday=$10, thursday=$11, friday=$12, saturday=$13, sunday=$14
 	WHERE id=$8
 	`
 
-	_, err := m.DB.Exec(stmt, s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID)
+	_, err := m.DB.Exec(stmt, s.Name, s.SpecialtyID, s.Location, s.Address, s.Url, s.Telephone, s.Email, s.ID, s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday)
 	if err != nil {
 		return err
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Scraper) insertSpecialties(specialists []struct {
-	Properties geoportalSpecialist
+	Properties types.GeoportalSpecialist
 }) error {
 	specialtiesMap := make(map[string]bool)
 
@@ -39,7 +39,7 @@ func (s *Scraper) insertSpecialties(specialists []struct {
 }
 
 func (s *Scraper) ScrapeHandler() error {
-	// Scrape data from geoportal API
+	// scrape data from geoportal API
 	specialists, err := s.GetSpecialists()
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func (s *Scraper) ScrapeHandler() error {
 		}
 
 		// insert specialist
-		castedSpecialist := specialist.Properties.castToDbType(specialty.ID)
+		castedSpecialist := specialist.Properties.CastToDbType(specialty.ID)
 		err = s.Models.DB.InsertSpecialist(castedSpecialist)
 		if err != nil {
 			return err

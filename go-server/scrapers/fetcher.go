@@ -5,12 +5,13 @@ import (
 	"errors"
 	"os"
 
+	"github.com/acornak/healthcare-poc/types"
 	"go.uber.org/zap"
 )
 
 type GetSpecialistsResponse struct {
 	Features []struct {
-		Properties geoportalSpecialist
+		Properties types.GeoportalSpecialist
 	}
 }
 

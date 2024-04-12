@@ -30,7 +30,7 @@ func TestGetSpecialtiesHandler_SqlError(t *testing.T) {
 
 	modelsDB := models.NewModels(db)
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,
@@ -74,7 +74,7 @@ func TestGetSpecialtiesHandler_EmptyResponse(t *testing.T) {
 
 	modelsDB := models.NewModels(db)
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,
@@ -124,7 +124,7 @@ func TestGetSpecialtiesHandler_Success(t *testing.T) {
 
 	modelsDB := models.NewModels(db)
 
-	r := gin.New() // Create a new Gin router for each test case
+	r := gin.New()
 	handler := &Handler{
 		Logger: logger,
 		Models: modelsDB,

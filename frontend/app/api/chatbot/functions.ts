@@ -80,7 +80,7 @@ const functionDescription = [
 				radius: {
 					type: "number",
 					description:
-						"Radius a user is willing to travel to see a specialist. Radius should always be in METERS.",
+						"Radius a user is willing to travel to see a specialist. Radius should always be in METERS. Default value is 10000 meters.",
 				},
 				user_location: {
 					type: "string",

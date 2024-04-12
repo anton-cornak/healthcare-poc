@@ -14,7 +14,7 @@ import (
 )
 
 func TestAddHandler_InvalidJson(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -26,36 +26,29 @@ func TestAddHandler_InvalidJson(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := "{invalid_json}"
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/add", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/add", handler.Add)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid JSON payload", response.Error)
 }
 
 func TestAddHandler_MissingInput(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -67,34 +60,26 @@ func TestAddHandler_MissingInput(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := map[string]interface{}{}
 
-	// Marshal the payload to JSON
 	payloadJSON, _ := json.Marshal(payload)
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/add", bytes.NewBuffer(payloadJSON))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/add", handler.Add)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid payload: missing numbers field", response.Error)
 }
 
@@ -115,7 +100,7 @@ func TestAddHandler_ValidInput(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		r := gin.New() // Create a new Gin router for each test case
+		r := gin.New()
 		handler := &Handler{
 			Logger: logger,
 		}
@@ -151,7 +136,7 @@ func TestAddHandler_ValidInput(t *testing.T) {
 }
 
 func TestSubtractHandler_InvalidJson(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -163,36 +148,29 @@ func TestSubtractHandler_InvalidJson(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := "{invalid_json}"
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/subtract", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/subtract", handler.Subtract)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid JSON payload", response.Error)
 }
 
 func TestSubtractHandler_MissingInput(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -204,34 +182,26 @@ func TestSubtractHandler_MissingInput(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := map[string]interface{}{}
 
-	// Marshal the payload to JSON
 	payloadJSON, _ := json.Marshal(payload)
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/subtract", bytes.NewBuffer(payloadJSON))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/subtract", handler.Subtract)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid payload: missing subtract field", response.Error)
 }
 
@@ -252,7 +222,7 @@ func TestSubtractHandler_ValidInput(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		r := gin.New() // Create a new Gin router for each test case
+		r := gin.New()
 		handler := &Handler{
 			Logger: logger,
 		}
@@ -288,7 +258,7 @@ func TestSubtractHandler_ValidInput(t *testing.T) {
 }
 
 func TestComputeHandler_InvalidJson(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -300,36 +270,29 @@ func TestComputeHandler_InvalidJson(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := "{invalid_json}"
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/compute", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/compute", handler.Compute)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid JSON payload", response.Error)
 }
 
 func TestComputeHandler_MissingInput(t *testing.T) {
-	// Create a new Gin router and handler
+
 	r := gin.New()
 
 	logger, err := zap.NewProduction()
@@ -341,34 +304,26 @@ func TestComputeHandler_MissingInput(t *testing.T) {
 		Logger: logger,
 	}
 
-	// Define an invalid payload
 	payload := map[string]interface{}{}
 
-	// Marshal the payload to JSON
 	payloadJSON, _ := json.Marshal(payload)
 
-	// Create a test request with the JSON payload
 	req, _ := http.NewRequest("POST", "/compute", bytes.NewBuffer(payloadJSON))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Create a test recorder
 	w := httptest.NewRecorder()
 
-	// Handle the request
 	r.POST("/compute", handler.Compute)
 	r.ServeHTTP(w, req)
 
-	// Assert the HTTP response code
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-	// Unmarshal the response JSON
 	var response ErrorResponse
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Error unmarshaling response: %v", err)
 	}
 
-	// Assert the error message
 	assert.Equal(t, "Invalid payload: missing add and subtract fields", response.Error)
 }
 
@@ -389,7 +344,7 @@ func TestComputeHandler_ValidInput(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		r := gin.New() // Create a new Gin router for each test case
+		r := gin.New()
 		handler := &Handler{
 			Logger: logger,
 		}

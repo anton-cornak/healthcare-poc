@@ -8,7 +8,6 @@ import (
 )
 
 func TestNewModels(t *testing.T) {
-	// Open database mock
 	db, _, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %s", err)
